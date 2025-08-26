@@ -1315,6 +1315,11 @@ class AdminService
         unset($province['categories']);
         unset($province['categories_list_packages']);
         unset($province['languages']);
+                    unset($province['seo_content_head']);
+            unset($province['seo_content_listing']);
+            unset($province['seo_listing']);
+            unset($province['seo_overview']);
+            unset($province['footer_links']);
 
 
         $province['google_map'] = !empty($province['google_map'])
@@ -1324,13 +1329,13 @@ class AdminService
         $province['price_info']=!empty($province['price_info'])
         ? unserialize($province['price_info'])
         : '';
-        $province['seo_overview']=!empty($province['seo_overview']) ? AdminHelper::deepDecodeFooter($province['seo_overview']):'';
+        // $province['seo_overview']=!empty($province['seo_overview']) ? AdminHelper::deepDecodeFooter($province['seo_overview']):'';
 
-        $province['seo_listing']=!empty($province['seo_listing']) ? AdminHelper::deepDecodeFooter($province['seo_listing']):'';
+        // $province['seo_listing']=!empty($province['seo_listing']) ? AdminHelper::deepDecodeFooter($province['seo_listing']):'';
 
-        $province['seo_content_head']=!empty($province['seo_content_head']) ? AdminHelper::deepDecodeFooter($province['seo_content_head']):'';
+        // $province['seo_content_head']=!empty($province['seo_content_head']) ? AdminHelper::deepDecodeFooter($province['seo_content_head']):'';
 
-        $province['seo_content_listing']=!empty($province['seo_content_listing']) ? AdminHelper::deepDecodeFooter($province['seo_content_listing']):'';
+        // $province['seo_content_listing']=!empty($province['seo_content_listing']) ? AdminHelper::deepDecodeFooter($province['seo_content_listing']):'';
 
 
         $province['currency']=!empty($province['currency'])? AdminHelper::decodeLangString($province['currency']):'';
@@ -1424,21 +1429,21 @@ class AdminService
             $province['meta_description_hotels']=AdminHelper::decodeLangString($province['meta_description_hotels']);
 
         }    
-        if (!empty($province->footer_links)) {
-            $province['footer_links']=AdminHelper::deepUnserializeCategiry_List($province['footer_links']);
-        }
+        // if (!empty($province->footer_links)) {
+        //     $province['footer_links']=AdminHelper::deepUnserializeCategiry_List($province['footer_links']);
+        // }
         if (!empty($province->banners)) {
             $province['banners']=AdminHelper::deepUnserializeCategiry_List($province['banners']);
         }
         if (!empty($province->footers)) {
             $province['footers']=AdminHelper::deepDecodeFooter($province['footers']);
         }
-                $province['seo_content_head']=!empty($province['seo_content_head']) ? AdminHelper::deepDecodeFooter($province['seo_content_head']):'';
-        $province['seo_content_listing']=!empty($province['seo_content_listing']) ? AdminHelper::deepDecodeFooter($province['seo_content_listing']):'';
+        //         $province['seo_content_head']=!empty($province['seo_content_head']) ? AdminHelper::deepDecodeFooter($province['seo_content_head']):'';
+        // $province['seo_content_listing']=!empty($province['seo_content_listing']) ? AdminHelper::deepDecodeFooter($province['seo_content_listing']):'';
 
 
-               $province['seo_overview']=!empty($province['seo_overview']) ? AdminHelper::deepDecodeFooter($province['seo_overview']):'';
-               $province['seo_listing']=!empty($province['seo_listing']) ? AdminHelper::deepDecodeFooter($province['seo_listing']):'';
+            //    $province['seo_overview']=!empty($province['seo_overview']) ? AdminHelper::deepDecodeFooter($province['seo_overview']):'';
+            //    $province['seo_listing']=!empty($province['seo_listing']) ? AdminHelper::deepDecodeFooter($province['seo_listing']):'';
         if (!empty($province->categories_list)) {
             $data = AdminHelper::deepUnserializeCategiry_List($province->categories_list);
             $categories_list = [];
@@ -1482,6 +1487,13 @@ class AdminService
             unset($province['destination_type']);
             unset($province['languages']);
             unset($province['number_packages']);
+            unset($province['seo_content_head']);
+            unset($province['seo_content_listing']);
+            unset($province['seo_listing']);
+            unset($province['seo_overview']);
+            unset($province['footer_links']);
+
+
             // unset($province['metas']);
         return $province;
         });
@@ -1499,9 +1511,20 @@ class AdminService
 
     public function addNewProvince(array $data)
     {
-        
+            try {
+                $country=[];
+                $country=$data;
+
+                return $country;
+
+
+            } catch (\Exception $e) {
+                return response()->json([
+                    'error'   => 'Something went wrong!',
+                    'message' => $e->getMessage()
+                ], 500);
+            }
     }
-    
 
 
 

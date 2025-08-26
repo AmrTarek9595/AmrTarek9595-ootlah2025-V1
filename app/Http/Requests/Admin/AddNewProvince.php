@@ -22,7 +22,7 @@ class AddNewProvince extends FormRequest
     public function rules(): array
     {
         return [
-            'Country_id' => 'required|exists:wp_countries,id',
+            'country_id' => 'required|exists:wp_countries,id',
             'province_code' => 'sometimes|string|max:255',
             'name' => 'sometimes|string|max:255',
             'name_ar' => 'sometimes|string|max:255',
@@ -34,45 +34,45 @@ class AddNewProvince extends FormRequest
             'banner_image' => 'sometimes|file|mimes:jpeg,png,jpg,webp|max:2048',
             /**End Banner Params */
             /**Start Section of SEO_OVERVIEW */
-            'seo_overview_main_en' => 'sometimes|array|max:255',
-            'seo_overview_main_ar' => 'sometimes|array|max:255',
-            'seo_overview_activities_en' => 'sometimes|array|max:255',
-            'seo_overview_activities_ar' => 'sometimes|array|max:255',
-            'seo_overview_packages_en' => 'sometimes|array|max:255',
-            'seo_overview_packages_ar' => 'sometimes|array|max:255',
+            // 'seo_overview_main_en' => 'sometimes|array|max:255',
+            // 'seo_overview_main_ar' => 'sometimes|array|max:255',
+            // 'seo_overview_activities_en' => 'sometimes|array|max:255',
+            // 'seo_overview_activities_ar' => 'sometimes|array|max:255',
+            // 'seo_overview_packages_en' => 'sometimes|array|max:255',
+            // 'seo_overview_packages_ar' => 'sometimes|array|max:255',
             /**End Section of SEO_OVERVIEW */
 
             /**Start Section of Seo_listing */
             /**Start Section Of main in Seo_listing */
-            'seo_listing_main_pictures'   => 'sometimes|array|max:255',
-            'seo_listing_main_pictures.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            // 'seo_listing_main_pictures'   => 'sometimes|array|max:255',
+            // 'seo_listing_main_pictures.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
 
 
           
-            'seo_listing_main_alt_text_en' => 'sometimes|array|max:255',
-            'seo_listing_main_alt_text_ar' => 'sometimes|array|max:255',
+            // 'seo_listing_main_alt_text_en' => 'sometimes|array|max:255',
+            // 'seo_listing_main_alt_text_ar' => 'sometimes|array|max:255',
 
-            'seo_listing_main_names_en' => 'sometimes|array|max:255',
-            'seo_listing_main_names_ar' => 'sometimes|array|max:255',
+            // 'seo_listing_main_names_en' => 'sometimes|array|max:255',
+            // 'seo_listing_main_names_ar' => 'sometimes|array|max:255',
 
 
-            'seo_listing_main_contents_en' => 'sometimes|array|max:255',
-            'seo_listing_main_contents_ar' => 'sometimes|array|max:255',
+            // 'seo_listing_main_contents_en' => 'sometimes|array|max:255',
+            // 'seo_listing_main_contents_ar' => 'sometimes|array|max:255',
             /**End Section Of main in Seo_listing */
             /**Start Section Of activities in Seo_listing */
-            'seo_listing_activities_pictures'   => 'sometimes|array|max:255',
-            'seo_listing_activities_pictures.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            // 'seo_listing_activities_pictures'   => 'sometimes|array|max:255',
+            // 'seo_listing_activities_pictures.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
 
 
-             'seo_listing_activities_alt_text_en' => 'sometimes|array|max:255',
-            'seo_listing_activities_alt_text_ar' => 'sometimes|array|max:255',
+            //  'seo_listing_activities_alt_text_en' => 'sometimes|array|max:255',
+            // 'seo_listing_activities_alt_text_ar' => 'sometimes|array|max:255',
 
-            'seo_listing_activities_names_en' => 'sometimes|array|max:255',
-            'seo_listing_activities_names_ar' => 'sometimes|array|max:255',
+            // 'seo_listing_activities_names_en' => 'sometimes|array|max:255',
+            // 'seo_listing_activities_names_ar' => 'sometimes|array|max:255',
 
 
-            'seo_listing_activities_contents_en' => 'sometimes|array|max:255',
-            'seo_listing_activities_contents_ar' => 'sometimes|array|max:255',
+            // 'seo_listing_activities_contents_en' => 'sometimes|array|max:255',
+            // 'seo_listing_activities_contents_ar' => 'sometimes|array|max:255',
             /**End Section Of activities in Seo_listing */
             /**End Section of Seo_listing */
 
@@ -115,9 +115,11 @@ class AddNewProvince extends FormRequest
                 "footers_main_anchor_links_en"=>"sometimes|array|max:255",
                 "footers_main_anchor_links_ar"=>"sometimes|array|max:255",
                 /**End Footer Params */
+                'search_query' => 'sometimes|string|max:255',
+                'search_query_ar' => 'sometimes|string|max:255',
 
 
-                
+
         
 
 
