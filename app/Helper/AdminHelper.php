@@ -196,4 +196,21 @@ public static function wrapLang($enValue, $arValue) {
     return $en . $ar;
 
 }
+public static function isSerialized($value)
+{
+    // لازم تكون سترينج
+    if (!is_string($value)) {
+        return false;
+    }
+
+    $value = trim($value);
+
+    if ($value === 'N;') {
+        return true; // special case for null
+    }
+
+    // لو unserialize اشتغلت من غير error يبقى serialized
+    return (@unserialize($value) !== false);
+}
+
 }

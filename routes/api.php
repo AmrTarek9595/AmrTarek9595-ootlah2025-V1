@@ -60,9 +60,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 
          Route::prefix('admin/countries/provinces')->middleware(['Role:administrator'])->group(function () {
-            Route::get('/getcustomprovince/{id}', [AdminController::class, 'getCustomProvince']);
-            Route::get('/getallprovinces', [AdminController::class, 'getAllProvinces']);
+            Route::get('/getcustomprovince/{id}', [AdminController::class, 'getCustomProvince']); // Return Custom Provinces
+            Route::get('/getallprovinces', [AdminController::class, 'getAllProvinces']); // Get All Provinces
             Route::post('/addnewprovince', [AdminController::class, 'addNewProvince']); // Add a new Province
+            Route::put('/updateprovince/{id}', [AdminController::class, 'updateProvince']); // Update Province
+            Route::delete('/deleteprovince/{id}', [AdminController::class, 'deleteProvince']); // Delete Province by ID
 
     });
 });

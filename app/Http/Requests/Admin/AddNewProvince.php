@@ -23,16 +23,25 @@ class AddNewProvince extends FormRequest
     {
         return [
             'country_id' => 'required|exists:wp_countries,id',
-            'province_code' => 'sometimes|string|max:255',
-            'name' => 'sometimes|string|max:255',
-            'name_ar' => 'sometimes|string|max:255',
-            'title' => 'sometimes|string|max:255',
-            'title_ar' => 'sometimes|string|max:255',
+            'province_code' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
+            'name_ar' => 'required|string|max:255',
+            'title' => 'required|string|max:255',
+            'title_ar' => 'required|string|max:255',
             /**Banner Params */
             "banner_alt_text_en"=>"sometimes|string|max:255",
             "banner_alt_text_ar"=>"sometimes|string|max:255",
             'banner_image' => 'sometimes|file|mimes:jpeg,png,jpg,webp|max:2048',
             /**End Banner Params */
+
+            // Activities Banner
+            "banner_activities_alt_text_en"=>"sometimes|string|max:255",
+            "banner_activities_alt_text_ar"=>"sometimes|string|max:255",
+            'banner_activities' => 'sometimes|file|mimes:jpeg,png,jpg,webp|max:2048',
+
+
+
+            //END OF ACTIVITISE BANNER
             /**Start Section of SEO_OVERVIEW */
             // 'seo_overview_main_en' => 'sometimes|array|max:255',
             // 'seo_overview_main_ar' => 'sometimes|array|max:255',
@@ -86,6 +95,12 @@ class AddNewProvince extends FormRequest
                 "faq_activities_questions_ar"=>"sometimes|array|max:255",
                 "faq_activities_answers_en"=>"sometimes|array|max:255",
                 "faq_activities_answers_ar"=>"sometimes|array|max:255",
+
+                "faq_restaurants_questions_en"=>"sometimes|array|max:255",
+                "faq_restaurants_questions_ar"=>"sometimes|array|max:255",
+                "faq_restaurants_answers_en"=>"sometimes|array|max:255",
+                "faq_restaurants_answers_ar"=>"sometimes|array|max:255",
+
             /**End Section of FAQ */
 
                 'categories_list' => 'sometimes|array|max:1000',
@@ -102,12 +117,14 @@ class AddNewProvince extends FormRequest
                "footers_activities_anchor_texts_ar"=>"sometimes|array|max:255",    
                 "footers_activities_anchor_links_en"=>"sometimes|array|max:255",
                 "footers_activities_anchor_links_ar"=>"sometimes|array|max:255",
+
                 "footers_restaurants_titles_en"=>"sometimes|array|max:255",
                 "footers_restaurants_titles_ar"=>"sometimes|array|max:255",
                 "footers_restaurants_anchor_texts_en"=>"sometimes|array|max:255",
                 "footers_restaurants_anchor_texts_ar"=>"sometimes|array|max:255",
                 "footers_restaurants_anchor_links_en"=>"sometimes|array|max:255",
                 "footers_restaurants_anchor_links_ar"=>"sometimes|array|max:255",
+                
                 "footers_main_titles_en"=>"sometimes|array|max:255",
                 "footers_main_titles_ar"=>"sometimes|array|max:255",
                 "footers_main_anchor_texts_en"=>"sometimes|array|max:255",
@@ -117,10 +134,22 @@ class AddNewProvince extends FormRequest
                 /**End Footer Params */
                 'search_query' => 'sometimes|string|max:255',
                 'search_query_ar' => 'sometimes|string|max:255',
+                /**Start Metas Section  */
+                "activities_title_en" => "sometimes|string|max:255",
+                "activities_title_ar" => "sometimes|string|max:255",
+                "activities_description_en" => "sometimes|string|max:255",
+                "activities_description_ar" => "sometimes|string|max:255",
+                "activities_keywords_en" => "sometimes|string|max:255",
+                "activities_keywords_ar" => "sometimes|string|max:255",
 
 
-
-        
+                "main_title_en" => "sometimes|string|max:255",
+                "main_title_ar" => "sometimes|string|max:255",
+                "main_description_en" => "sometimes|string|max:255",
+                "main_description_ar" => "sometimes|string|max:255",
+                "main_keywords_en" => "sometimes|string|max:255",
+                "main_keywords_ar" => "sometimes|string|max:255",
+                "status"=>"required|in:0,1"
 
 
 

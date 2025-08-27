@@ -134,6 +134,16 @@ class AdminController extends Controller
         return $this->adminService->addNewProvince($request->validated());
     }
 
+    public function updateProvince($id, AddNewProvince $request)
+    {
+        return $this->adminService->updateProvince($id, $request->validated());
+    }
+    public function deleteProvince($id)
+    {
+        return $this->adminService->deleteProvince($id);
+    }
+
+
 
 
 

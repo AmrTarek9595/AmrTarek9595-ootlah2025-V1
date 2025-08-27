@@ -659,25 +659,24 @@ class AdminService
                     // serialize the whole structure
                     $faq_serialized = serialize($faq); // Final serialize the whole structure
 
-                    /***
-                     * 
-                     * END SECTION OF FAQ
-                     */
+            /***
+             * 
+             * END SECTION OF FAQ
+             */
 
 
 
-                        /***
-                         * 
-                         * Start Section OF Categories LIST 
-                         * 
-                         */
+            /***
+             * 
+             * Start Section OF Categories LIST 
+             * 
+             */
                 $categories_list = [];
 
                 if (isset($data['categories_list'] ) && is_array($data['categories_list'])) 
                     {
                         foreach ($data['categories_list'] as $parentId => $childIds) 
                             {
-                            // اتأكد ان الـ parent موجود
                             $parentExists = DB::table('wp_packages_main_category')
                                 ->where('id', $parentId)
                                 ->exists();
@@ -686,7 +685,6 @@ class AdminService
                                 continue;
                             }
 
-                            // هات الـ children اللي فعلاً تبع الـ parent
                             $validChildren = DB::table('wp_adventure_type')
                                 ->where('category_id', $parentId)
                                 ->whereIn('id', $childIds)
@@ -697,7 +695,6 @@ class AdminService
                                 continue;
                             }
 
-                            // خزنهم بنفس الشكل المطلوب (id => "id")
                             $childrenArray = [];
                             foreach ($validChildren as $childId) {
                                 $childrenArray[$childId] = (string) $childId;
@@ -707,7 +704,7 @@ class AdminService
                             }
                     }
 
-            $Categories_serialized = serialize($categories_list); //Final Serialized to DB of Categories List
+                $Categories_serialized = serialize($categories_list); //Final Serialized to DB of Categories List
         
             /***
              * 
@@ -840,59 +837,59 @@ class AdminService
     public function updateCountry(int $id, array $data)
     {
         try {
-            $country = Country::where('id', $id)->first();
+                $country = Country::where('id', $id)->first();
+                
+                if (!$country) {
+                    throw new \Exception("Country not found");
+                }
+
+                $name= $data['name'] ?? $country->name;
             
-            if (!$country) {
-                throw new \Exception("Country not found");
-            }
+                $name_ar     = $data['name_ar'] ?? $country->name_ar;
+                $title       = $data['title'] ?? $country->title;
+                $title_ar    = $data['title_ar'] ?? $country->title_ar;
+                $continent   = $data['continent'] ?? $country->continent;
+                $country_code= $data['country_code'] ?? $country->country_code;
+                $timezone    = $data['timezone'] ?? $country->timezone;
+                $whatsapp_number = $data['whatsapp_number'] ?? $country->whatsapp_number;
 
-            $name        = $data['name'] ?? $country->name;
-        
-            $name_ar     = $data['name_ar'] ?? $country->name_ar;
-            $title       = $data['title'] ?? $country->title;
-            $title_ar    = $data['title_ar'] ?? $country->title_ar;
-            $continent   = $data['continent'] ?? $country->continent;
-            $country_code= $data['country_code'] ?? $country->country_code;
-            $timezone    = $data['timezone'] ?? $country->timezone;
-            $whatsapp_number = $data['whatsapp_number'] ?? $country->whatsapp_number;
+                $google_map = serialize([
+                    'location'  => $data['location'] ?? unserialize($country->google_map)['location'] ?? null,  
+                    'latitude'  => $data['latitude'] ?? unserialize($country->google_map)['latitude'] ?? null,  
+                    'longitude' => $data['longitude'] ?? unserialize($country->google_map)['longitude'] ?? null   
+                ]);
 
-            $google_map = serialize([
-                'location'  => $data['location'] ?? unserialize($country->google_map)['location'] ?? null,  
-                'latitude'  => $data['latitude'] ?? unserialize($country->google_map)['latitude'] ?? null,  
-                'longitude' => $data['longitude'] ?? unserialize($country->google_map)['longitude'] ?? null   
-            ]);
+                $currency = "[en]" . ($data['currency_en'] ?? '') . "[en]"
+                        . "[ar]" . ($data['currency_ar'] ?? '') . "[ar]";
 
-            $currency = "[en]" . ($data['currency_en'] ?? '') . "[en]"
-                    . "[ar]" . ($data['currency_ar'] ?? '') . "[ar]";
+                $status = $data['status'] ?? $country->status;
 
-            $status = $data['status'] ?? $country->status;
+                /**
+                 * Banner image update (optional)
+                 */
+                $banner_path = $country->banner_image ?? null;
+                $banner_alt_text = $country->banner_alt_text ?? null;
+
+                if (isset($data['banner_image']) && $data['banner_image'] instanceof \Illuminate\Http\UploadedFile) 
+                    {
+                    $year = date('Y');   
+                    $month = date('m'); 
+                    $folderPath = public_path("wp-content/uploads/{$year}/{$month}");
+
+                    if (!file_exists($folderPath)) {
+                        mkdir($folderPath, 0777, true);
+                    }
+
+                    $imageName = time().'_'.uniqid().'.'.$data['banner_image']->extension();
+                    $data['banner_image']->move($folderPath, $imageName);
+
+                    $banner_path = "wp-content/uploads/{$year}/{$month}/{$imageName}";
+                    $banner_alt_text = "[en]".($data['banner_alt_text_en'] ?? '')."[en]"
+                                    ."[ar]".($data['banner_alt_text_ar'] ?? '')."[ar]";
+                    }
+
 
             /**
-             * Banner image update (optional)
-             */
-            $banner_path = $country->banner_image ?? null;
-            $banner_alt_text = $country->banner_alt_text ?? null;
-
-            if (isset($data['banner_image']) && $data['banner_image'] instanceof \Illuminate\Http\UploadedFile) 
-                {
-                $year = date('Y');   
-                $month = date('m'); 
-                $folderPath = public_path("wp-content/uploads/{$year}/{$month}");
-
-                if (!file_exists($folderPath)) {
-                    mkdir($folderPath, 0777, true);
-                }
-
-                $imageName = time().'_'.uniqid().'.'.$data['banner_image']->extension();
-                $data['banner_image']->move($folderPath, $imageName);
-
-                $banner_path = "wp-content/uploads/{$year}/{$month}/{$imageName}";
-                $banner_alt_text = "[en]".($data['banner_alt_text_en'] ?? '')."[en]"
-                                ."[ar]".($data['banner_alt_text_ar'] ?? '')."[ar]";
-                }
-
-
-        /**
                      * Start Section of Banners 
                      */
                     if (isset($data['banners_activities_main_banner']) && $data['banners_activities_main_banner'] instanceof \Illuminate\Http\UploadedFile ) 
@@ -1085,7 +1082,6 @@ class AdminService
                         {
                             foreach ($data['categories_list'] as $parentId => $childIds) 
                                 {
-                                // اتأكد ان الـ parent موجود
                                 $parentExists = DB::table('wp_packages_main_category')
                                     ->where('id', $parentId)
                                     ->exists();
@@ -1094,7 +1090,6 @@ class AdminService
                                     continue;
                                 }
 
-                                // هات الـ children اللي فعلاً تبع الـ parent
                                 $validChildren = DB::table('wp_adventure_type')
                                     ->where('category_id', $parentId)
                                     ->whereIn('id', $childIds)
@@ -1309,19 +1304,33 @@ class AdminService
 
         $province['banner_alt_text']=!empty($province['banner_alt_text']) ? AdminHelper::decodeLangString($province['banner_alt_text']):'';   
         $province['banner_activities_alt_text']=!empty($province['banner_activities_alt_text']) ? AdminHelper::decodeLangString($province['banner_activities_alt_text']):'';        
-        $province['banner_packages_alt_text']=!empty($province['banner_packages_alt_text']) ? AdminHelper::decodeLangString($province['banner_packages_alt_text']):'';
+        // $province['banner_packages_alt_text']=!empty($province['banner_packages_alt_text']) ? AdminHelper::decodeLangString($province['banner_packages_alt_text']):'';
 
         $province['categories_list'] = $categories_list;
         unset($province['categories']);
         unset($province['categories_list_packages']);
         unset($province['languages']);
-                    unset($province['seo_content_head']);
-            unset($province['seo_content_listing']);
-            unset($province['seo_listing']);
-            unset($province['seo_overview']);
-            unset($province['footer_links']);
+        unset($province['seo_content_head']);
+        unset($province['seo_content_listing']);
+        unset($province['seo_listing']);
+        unset($province['seo_overview']);
+        unset($province['footer_links']);
+        // unset($province['banner_packages']);
+        // unset($province['banner_packages_alt_text']);
 
 
+     
+        unset($province['meta_keywords_packages']);
+        unset($province['meta_description_packages']);
+        unset($province['meta_title_packages']);
+        unset($province['meta_title_activites_show_count']);
+        unset($province['meta_keywords_activities']);
+        unset($province['meta_title']);
+        unset($province['meta_title_packages_show_count']);
+        unset($province['meta_description_activities']);
+        unset($province['meta_title_activities']);
+        unset($province['meta_keywords']);
+        unset($province['meta_description']);
         $province['google_map'] = !empty($province['google_map'])
         ? unserialize($province['google_map'])
         : '';
@@ -1338,22 +1347,22 @@ class AdminService
         // $province['seo_content_listing']=!empty($province['seo_content_listing']) ? AdminHelper::deepDecodeFooter($province['seo_content_listing']):'';
 
 
-        $province['currency']=!empty($province['currency'])? AdminHelper::decodeLangString($province['currency']):'';
-        $province['meta_title']=!empty($province['meta_title']) ? AdminHelper::decodeLangString($province['meta_title']):'';
-        $province['meta_description']=!empty($province['meta_description']) ?AdminHelper::decodeLangString($province['meta_description']):'';
-        $province['meta_keywords']=!empty($province['meta_keywords']) ?   AdminHelper::decodeLangString($province['meta_keywords']):'';
-        $province['meta_title_activities']=!empty($province['meta_title_activities']) ?   AdminHelper::decodeLangString($province['meta_title_activities']): '';
-        $province['meta_description_activities']=!empty($province['meta_description_activities']) ?   AdminHelper::decodeLangString($province['meta_description_activities']):'';    
-        $province['meta_keywords_activities']=!empty($province['meta_keywords_activities']) ?   AdminHelper::decodeLangString($province['meta_keywords_activities']):'';
+        // $province['currency']=!empty($province['currency'])? AdminHelper::decodeLangString($province['currency']):'';
+        // $province['meta_title']=!empty($province['meta_title']) ? AdminHelper::decodeLangString($province['meta_title']):'';
+        // $province['meta_description']=!empty($province['meta_description']) ?AdminHelper::decodeLangString($province['meta_description']):'';
+        // $province['meta_keywords']=!empty($province['meta_keywords']) ?   AdminHelper::decodeLangString($province['meta_keywords']):'';
+        // $province['meta_title_activities']=!empty($province['meta_title_activities']) ?   AdminHelper::decodeLangString($province['meta_title_activities']): '';
+        // $province['meta_description_activities']=!empty($province['meta_description_activities']) ?   AdminHelper::decodeLangString($province['meta_description_activities']):'';    
+        // $province['meta_keywords_activities']=!empty($province['meta_keywords_activities']) ?   AdminHelper::decodeLangString($province['meta_keywords_activities']):'';
 
 
                 
-        if (!empty($province->meta_keywords_packages)) {
-            $province['meta_keywords_packages']=AdminHelper::decodeLangString($province['meta_keywords_packages']);
-        }
-        $province['meta_title_packages']=!empty($province['meta_title_packages']) ?   AdminHelper::decodeLangString($province['meta_title_packages']):'';
+        // if (!empty($province->meta_keywords_packages)) {
+        //     $province['meta_keywords_packages']=AdminHelper::decodeLangString($province['meta_keywords_packages']);
+        // }
+        // $province['meta_title_packages']=!empty($province['meta_title_packages']) ?   AdminHelper::decodeLangString($province['meta_title_packages']):'';
 
-        $province['meta_description_packages']=!empty($province['meta_description_packages']) ? AdminHelper::decodeLangString($province['meta_description_packages']):'';
+        // $province['meta_description_packages']=!empty($province['meta_description_packages']) ? AdminHelper::decodeLangString($province['meta_description_packages']):'';
        
 
         $province['banners']=!empty($province['banners'])? AdminHelper::deepUnserializeCategiry_List($province['banners']):'';
@@ -1382,7 +1391,7 @@ class AdminService
         $province['banner_alt_text']=!empty($province['banner_alt_text']) ? AdminHelper::decodeLangString($province['banner_alt_text']):'';  
         $province['banner_activities_alt_text']=!empty($province['banner_activities_alt_text']) ? AdminHelper::decodeLangString($province['banner_activities_alt_text']):'';       
 
-        $province['banner_packages_alt_text']=!empty($province['banner_packages_alt_text']) ? AdminHelper::decodeLangString($province['banner_packages_alt_text']):'';
+        // $province['banner_packages_alt_text']=!empty($province['banner_packages_alt_text']) ? AdminHelper::decodeLangString($province['banner_packages_alt_text']):'';
 
 
         if (!empty($province->price_info)) {
@@ -1472,6 +1481,8 @@ class AdminService
 
             // هنا تخزن النتيجة جوة الكاونتري
             $province->categories_list = $categories_list;
+                    $province['metas']=!empty($province['metas'])? AdminHelper::deepUnserializeCategiry_List($province['metas']):'';
+        // unset($province['metas']);
         }
             unset($province['categories']);
             unset($province['categories_list_packages']);
@@ -1511,12 +1522,411 @@ class AdminService
 
     public function addNewProvince(array $data)
     {
+
+        /******************************
+         * Country_id $country_id
+         * Province_code $province_code
+         * Name $name
+         * Name_ar $name_ar
+         * Title $title
+         * Title_ar $title_ar
+         * $banner_alt_text
+         * $banner_path
+         * FAQ $faq_serialized
+         * Activities Banner $activities_main_banner_path
+         * Activities Banner Alt Text $banner_activities_alt_text
+         * Categories List $categories_serialized
+         * Google Map $google_map
+         * Search Query $search_query
+         * Search Query Arabic $search_query_ar
+         * Banners $serialized_banner
+         * Final Footers $Footers_encoded
+         * Status $status
+         * METAS $serializedMetas
+         * $slug
+         * *************
+         */
             try {
-                $country=[];
-                $country=$data;
 
-                return $country;
+                    $country_id=$data['country_id'];
+                    $province_code=$data['province_code'];
+                    $name=$data['name'] ?? '';
+                    $name_ar=$data['name_ar'] ?? '';
+                    $title=$data['title'] ?? '';
+                    $title_ar=$data['title_ar'] ?? '';
+                    $google_map = serialize([
+                        'location'  => $data['location'] ?? null,  
+                        'latitude'  => $data['latitude'] ?? null,  
+                        'longitude' => $data['longitude'] ?? null   
+                    ]);
+                    $search_query=$name;
+                    $search_query_ar=$name_ar;
+                    $slug=str_replace('','-',$name);
+                    $status=$data['status'] ?? 0;
 
+
+
+
+                                /**
+             * Start Section of Banner Image and Alt Text
+             */
+
+            if (isset($data['banner_image']) && $data['banner_image'] instanceof \Illuminate\Http\UploadedFile) 
+                {
+
+                    $year = date('Y');   
+                    $month = date('m'); 
+
+                    $folderPath = public_path("wp-content/uploads/{$year}/{$month}");
+
+                    if (!file_exists($folderPath)) {
+                        mkdir($folderPath, 0777, true);
+                    }
+
+                    $MainBannerPath = time().'_'.uniqid().'.'.$data['banner_image']->extension();
+
+                    $data['banner_image']->move($folderPath, $MainBannerPath);
+
+                    $banner_path = "wp-content/uploads/{$year}/{$month}/{$MainBannerPath}";
+                    $banner_alt_text = "[en]".($data['banner_alt_text_en']??'')."[en]"."[ar]".($data['banner_alt_text_ar']??'')."[ar]";
+
+
+                }
+
+                /**
+                 * END Section of Banner Image and Alt Text
+                 */
+
+                    /***
+                 * 
+                 * Start Section OF FAQ 
+                 * 
+                 */                
+                $main_question_text_en = $data['faq_main_questions_en'] ?? [];
+                $main_question_text_ar = $data['faq_main_questions_ar'] ?? [];
+                $main_answer_text_en   = $data['faq_main_answers_en'] ?? [];
+                $main_answer_text_ar   = $data['faq_main_answers_ar'] ?? [];
+
+
+                $activities_question_text_en = $data['faq_activities_questions_en'] ?? [];
+                $activities_question_text_ar = $data['faq_activities_questions_ar'] ?? [];
+                $activities_answer_text_en   = $data['faq_activities_answers_en'] ?? [];
+                $activities_answer_text_ar   = $data['faq_activities_answers_ar'] ?? [];
+
+
+                $faq_restaurants_question_text_en = $data['faq_restaurants_questions_en'] ?? [];
+                $faq_restaurants_question_text_ar = $data['faq_restaurants_questions_ar'] ?? [];
+                $faq_restaurants_answer_text_en   = $data['faq_restaurants_answers_en'] ?? [];
+                $faq_restaurants_answer_text_ar   = $data['faq_restaurants_answers_ar'] ?? [];
+
+
+
+
+
+
+                $main_questions_final =    AdminHelper::wrapLang($main_question_text_en, $main_question_text_ar);
+                // encode Main answers
+                $main_answers_final   = AdminHelper::wrapLang($main_answer_text_en, $main_answer_text_ar);
+                // encode packages questions
+
+                                // encode Activities questions
+                $activities_questions_final = AdminHelper::wrapLang($activities_question_text_en, $activities_question_text_ar);
+                // encode Activities answers
+                $activities_answers_final   =AdminHelper::wrapLang($activities_answer_text_en, $activities_answer_text_ar);
+                // final structure to save and serialize
+
+
+                $faq_restaurants_questions_final = AdminHelper::wrapLang($faq_restaurants_question_text_en, $faq_restaurants_question_text_ar);
+
+                // encode Restaurants answers
+                $faq_restaurants_answers_final   = AdminHelper::wrapLang($faq_restaurants_answer_text_en, $faq_restaurants_answer_text_ar);
+
+                $faq = [
+                    "activities" => [   
+                        "questions" => $activities_questions_final,
+                        "answers"   => $activities_answers_final,
+                    ],
+
+                    "main" => [
+                        "questions" => $main_questions_final,
+                        "answers"   => $main_answers_final,
+                    ],
+
+                    "restaurants" => [
+                        "questions" => $faq_restaurants_questions_final,
+                        "answers"   => $faq_restaurants_answers_final,
+                    ]
+                ];
+
+                    // serialize the whole structure
+                    $faq_serialized = serialize($faq); // Final serialize the whole structure
+                           
+
+
+                    /***
+                     * 
+                     * END SECTION OF FAQ
+                     */
+
+
+
+                    /****
+                     * 
+                     * ٍStart Section OF METAS
+                     */
+
+
+                    $metas = [
+                        "activities" => [
+                            "title" => [
+                                AdminHelper::wrapLang($data['activities_title_en'] ?? null, $data['activities_title_ar'] ?? null)
+                            ],
+                            "description" => [
+                                AdminHelper::wrapLang($data['activities_description_en'] ?? null, $data['activities_description_ar'] ?? null)
+                            ],
+                            "keywords" => [
+                                AdminHelper::wrapLang($data['activities_keywords_en'] ?? null, $data['activities_keywords_ar'] ?? null)
+                            ]
+                        ],
+
+
+
+                        "main" => [
+                            "title" => [
+                                AdminHelper::wrapLang($data['main_title_en'] ?? null, $data['main_title_ar'] ?? null)
+                            ],
+                            "description" => [
+                                AdminHelper::wrapLang($data['main_description_en'] ?? null, $data['main_description_ar'] ?? null)
+                            ],
+                            "keywords" => [
+                                AdminHelper::wrapLang($data['main_keywords_en'] ?? null, $data['main_keywords_ar'] ?? null)
+                            ]
+                        ]
+                            ];
+                    $serializedMetas = serialize($metas);
+                    /**
+                     * 
+                     * 
+                     * END SECTION OF METAS 
+                     * 
+                     * 
+                     */
+
+                    /**
+                     * 
+                     * START SECTION OF ACTIVITIES BANNER
+                     * 
+                     */
+
+                     if (isset($data['banner_activities']) && $data['banner_activities'] instanceof \Illuminate\Http\UploadedFile ) 
+                        {
+
+                            $year = date('Y');   
+                            $month = date('m'); 
+
+                            $folderPath = public_path("wp-content/uploads/{$year}/{$month}");
+
+                            if (!file_exists($folderPath)) {
+                                mkdir($folderPath, 0777, true);
+                            }
+
+                            $ActivitiesBanner = time().'_'.uniqid().'.'.$data['banner_activities']->extension();
+
+                            $data['banner_activities']->move($folderPath, $ActivitiesBanner);
+
+                            $activities_main_banner_path = "wp-content/uploads/{$year}/{$month}/{$ActivitiesBanner}";
+
+                            $banners_activities_main_banner_alt_en = $data['banner_activities_alt_text_en'] ?? null;
+                            $banners_activities_main_banner_alt_ar = $data['banner_activities_alt_text_ar'] ?? null;
+
+                            $banner_activities_alt_text = AdminHelper::wrapLang($banners_activities_main_banner_alt_en, $banners_activities_main_banner_alt_ar);
+
+                        }
+                    if(isset($data['banner_activities']) || isset($data['main_banner'])) 
+                        {
+                                $banners=[
+                                    "activities"=>[
+                                        "main_banner" => $activities_main_banner_path ?? null,
+                                        "main_banner_alt" => $banner_activities_alt_text ?? null
+                                    ],
+                                    "main"=>[
+                                        "main_banner" => $banner_path?? null,
+                                        "main_banner_alt" =>$banner_alt_text ?? null
+                                    ],
+                                    "restaurants"=> [
+                                        "main_banner" => $restaurants_main_banner_path ?? null,
+                                        "carousel_banner" => $restaurants_carousel_banner_path ?? null,
+                                        "video_banner" => $restaurants_video_banner_path ?? null,
+                                        "main_banner_alt" => $restaurants_main_banner_alt_text ?? null
+                                    ]
+
+
+                                ];
+                                $serialized_banner = serialize($banners);
+                        }
+                    /**
+                     * 
+                     * END SECTION OF ACTIVITIES BANNER
+                     * 
+                     */
+
+
+                    /***
+                         * 
+                         * Start Section OF Categories LIST 
+                         * 
+                         */
+                $categories_list = [];
+
+                if (isset($data['categories_list'] ) && is_array($data['categories_list'])) 
+                    {
+                        foreach ($data['categories_list'] as $parentId => $childIds) 
+                            {
+                            $parentExists = DB::table('wp_packages_main_category')
+                                ->where('id', $parentId)
+                                ->exists();
+
+                            if (!$parentExists) {
+                                continue;
+                            }
+
+                            $validChildren = DB::table('wp_adventure_type')
+                                ->where('category_id', $parentId)
+                                ->whereIn('id', $childIds)
+                                ->pluck('id')
+                                ->toArray();
+
+                            if (empty($validChildren)) {
+                                continue;
+                            }
+
+                            $childrenArray = [];
+                            foreach ($validChildren as $childId) {
+                                $childrenArray[$childId] = (string) $childId;
+                            }
+
+                            $categories_list[$parentId] = $childrenArray;
+                            }
+                    }
+
+            $Categories_serialized = serialize($categories_list); //Final Serialized to DB of Categories List
+        
+            /***
+             * 
+             * END SECTION OF Categories LIST 
+             */
+
+
+            /**
+             * Start Footers SECTION
+             */
+                    
+             $footers_activities_titles_final = AdminHelper::wrapLang(
+                $data['footers_activities_titles_en'] ?? '',
+                $data['footers_activities_titles_ar'] ?? ''
+            );
+
+            $footers_activities_anchor_texts_final = AdminHelper::wrapLang(
+                $data['footers_activities_anchor_texts_en'] ?? [],
+                $data['footers_activities_anchor_texts_ar'] ?? []
+            );
+
+            $footers_activities_anchor_links_final = AdminHelper::wrapLang(
+                $data['footers_activities_anchor_links_en'] ?? [],
+                $data['footers_activities_anchor_links_ar'] ?? []
+            );
+            // For Resturants Footers
+
+            $footers_restaurants_titles_final = AdminHelper::wrapLang(
+                $data['footers_restaurants_titles_en'] ?? '',
+                $data['footers_restaurants_titles_ar'] ?? ''
+            );
+
+            $footers_restaurants_anchor_texts_final = AdminHelper::wrapLang(
+                $data['footers_restaurants_anchor_texts_en'] ?? [],
+                $data['footers_restaurants_anchor_texts_ar'] ?? []
+            );
+
+            $footers_restaurants_anchor_links_final = AdminHelper::wrapLang(
+                $data['footers_restaurants_anchor_links_en'] ?? [],
+                $data['footers_restaurants_anchor_links_ar'] ?? []
+            );
+
+            // For Main Footers
+
+            $footers_main_titles_final = AdminHelper::wrapLang(
+                $data['footers_main_titles_en'] ?? '',
+                $data['footers_main_titles_ar'] ?? ''
+            );
+
+            $footers_main_anchor_texts_final = AdminHelper::wrapLang(
+                $data['footers_main_anchor_texts_en'] ?? [],
+                $data['footers_main_anchor_texts_ar'] ?? []
+            );
+
+            $footers_main_anchor_links_final = AdminHelper::wrapLang(
+                $data['footers_main_anchor_links_en'] ?? [],
+                $data['footers_main_anchor_links_ar'] ?? []
+            );
+
+
+
+
+
+            $footers = [
+                "activities" => [   
+                    "footer_titles" => $footers_activities_titles_final,
+                    "anchor_texts"  => $footers_activities_anchor_texts_final,
+                    "anchor_links"  => $footers_activities_anchor_links_final,
+                ],
+                "restaurants" => [
+                    "footer_titles" => $footers_restaurants_titles_final,
+                    "anchor_texts"  => $footers_restaurants_anchor_texts_final,
+                    "anchor_links"  => $footers_restaurants_anchor_links_final,
+                        ],
+
+                "main" => [
+                    "footer_titles" => $footers_main_titles_final,
+                    "anchor_texts"  => $footers_main_anchor_texts_final,
+                    "anchor_links"  => $footers_main_anchor_links_final,
+                        ]
+            ];
+
+
+            $Footers_encoded = serialize($footers);
+
+            /**
+             * 
+             * END FOOTERS SECTION
+             */
+
+            $NewProvince=new province();
+            $NewProvince->country_id=$country_id;
+            $NewProvince->province_code=$province_code;
+            $NewProvince->name=$name;
+            $NewProvince->name_ar=$name_ar;
+            $NewProvince->title=$title;
+            $NewProvince->title_ar=$title_ar;
+            $NewProvince->banner=$banner_path;
+            $NewProvince->banner_alt_text=$banner_alt_text;
+            $NewProvince->banner_activities=$activities_main_banner_path??NULL;
+            $NewProvince->banner_activities_alt_text=$banner_activities_alt_text??NULL;
+            $NewProvince->faq=$faq_serialized;
+            $NewProvince->categories_list=$Categories_serialized;
+            $NewProvince->google_map=$google_map;
+            $NewProvince->slug=$slug;
+            $NewProvince->search_query=$search_query;
+            $NewProvince->search_query_ar=$search_query_ar;
+            $NewProvince->status=$status;
+            $NewProvince->banners=$serialized_banner ??NULL;
+            $NewProvince->footers=$Footers_encoded;
+            $NewProvince->metas=$serializedMetas;
+
+            $NewProvince->save();
+            return response()->json([
+                'success' => true,
+                'data'    => $NewProvince
+            ]);
 
             } catch (\Exception $e) {
                 return response()->json([
@@ -1524,6 +1934,416 @@ class AdminService
                     'message' => $e->getMessage()
                 ], 500);
             }
+    }
+
+    public function updateProvince($id, array $data){
+        try {
+            $province = Province::findOrFail($id);
+                    $country_id=$data['country_id']?? $province->country_id;
+                    $province_code=$data['province_code']?? $province->province_code;
+                    $name=$data['name']?? $province->name;
+                    $name_ar=$data['name_ar']?? $province->name_ar;
+                    $title=$data['title']?? $province->title;
+                    $title_ar=$data['title_ar']?? $province->title_ar;
+                    $google_map =  serialize([
+                        'location'  => $data['location'] ?? null,  
+                        'latitude'  => $data['latitude'] ?? null,  
+                        'longitude' => $data['longitude'] ?? null   
+                    ]) ?? $province->google_map;
+                    $search_query=$data['search_query'] ?? $province->search_query;
+                    $search_query_ar=$data['search_query_ar'] ?? $province->search_query_ar;
+                    $slug=str_replace('','-',$name) ?? $province->slug;
+                    $status= $data['status'] ?? $province->status;
+
+
+
+
+                                /**
+             * Start Section of Banner Image and Alt Text
+             */
+                $banner_path = $province->banner_image ?? null;
+                $banner_alt_text = $province->banner_alt_text ?? null;
+
+            if (isset($data['banner_image']) && $data['banner_image'] instanceof \Illuminate\Http\UploadedFile) 
+                {
+
+                    $year = date('Y');   
+                    $month = date('m'); 
+
+                    $folderPath = public_path("wp-content/uploads/{$year}/{$month}");
+
+                    if (!file_exists($folderPath)) {
+                        mkdir($folderPath, 0777, true);
+                    }
+
+                    $MainBannerPath = time().'_'.uniqid().'.'.$data['banner_image']->extension();
+
+                    $data['banner_image']->move($folderPath, $MainBannerPath);
+
+                    $banner_path = "wp-content/uploads/{$year}/{$month}/{$MainBannerPath}";
+                    $banner_alt_text = "[en]".($data['banner_alt_text_en']??'')."[en]"."[ar]".($data['banner_alt_text_ar']??'')."[ar]";
+
+
+                }
+
+                /**
+                 * END Section of Banner Image and Alt Text
+                 */
+
+                    /***
+                 * 
+                 * Start Section OF FAQ 
+                 * 
+                 */                
+               $oldFaq = $province->faq ? unserialize($province->faq) : [];
+
+                        // Main section
+                        $main_questions_final = isset($data['faq_main_questions_en'], $data['faq_main_questions_ar'])
+                            ? AdminHelper::wrapLang($data['faq_main_questions_en'], $data['faq_main_questions_ar'])
+                            : ($oldFaq['main']['questions'] ?? []);
+
+                        $main_answers_final = isset($data['faq_main_answers_en'], $data['faq_main_answers_ar'])
+                            ? AdminHelper::wrapLang($data['faq_main_answers_en'], $data['faq_main_answers_ar'])
+                            : ($oldFaq['main']['answers'] ?? []);
+
+                        // Activities
+                        $activities_questions_final = isset($data['faq_activities_questions_en'], $data['faq_activities_questions_ar'])
+                            ? AdminHelper::wrapLang($data['faq_activities_questions_en'], $data['faq_activities_questions_ar'])
+                            : ($oldFaq['activities']['questions'] ?? []);
+
+                        $activities_answers_final = isset($data['faq_activities_answers_en'], $data['faq_activities_answers_ar'])
+                            ? AdminHelper::wrapLang($data['faq_activities_answers_en'], $data['faq_activities_answers_ar'])
+                            : ($oldFaq['activities']['answers'] ?? []);
+
+                        // Restaurants
+                        $faq_restaurants_questions_final = isset($data['faq_restaurants_questions_en'], $data['faq_restaurants_questions_ar'])
+                            ? AdminHelper::wrapLang($data['faq_restaurants_questions_en'], $data['faq_restaurants_questions_ar'])
+                            : ($oldFaq['restaurants']['questions'] ?? []);
+
+                        $faq_restaurants_answers_final = isset($data['faq_restaurants_answers_en'], $data['faq_restaurants_answers_ar'])
+                            ? AdminHelper::wrapLang($data['faq_restaurants_answers_en'], $data['faq_restaurants_answers_ar'])
+                            : ($oldFaq['restaurants']['answers'] ?? []);
+
+
+                        // build final faq
+                        $faq = [
+                            "activities" => [   
+                                "questions" => $activities_questions_final,
+                                "answers"   => $activities_answers_final,
+                            ],
+                            "main" => [
+                                "questions" => $main_questions_final,
+                                "answers"   => $main_answers_final,
+                            ],
+                            "restaurants" => [
+                                "questions" => $faq_restaurants_questions_final,
+                                "answers"   => $faq_restaurants_answers_final,
+                            ]
+                        ];
+
+                        $faq_serialized = serialize($faq);
+                                                
+
+
+                    /***
+                     * 
+                     * END SECTION OF FAQ
+                     */
+
+
+
+                    /****
+                     * 
+                     * ٍStart Section OF METAS
+                     */
+
+
+                        $oldMetas = $province->metas ? unserialize($province->metas) : [];
+
+                        $metas = [
+                            "activities" => [
+                                "title" => [
+                                    isset($data['activities_title_en'], $data['activities_title_ar'])
+                                        ? AdminHelper::wrapLang($data['activities_title_en'], $data['activities_title_ar'])
+                                        : ($oldMetas['activities']['title'][0] ?? null)
+                                ],
+                                "description" => [
+                                    isset($data['activities_description_en'], $data['activities_description_ar'])
+                                        ? AdminHelper::wrapLang($data['activities_description_en'], $data['activities_description_ar'])
+                                        : ($oldMetas['activities']['description'][0] ?? null)
+                                ],
+                                "keywords" => [
+                                    isset($data['activities_keywords_en'], $data['activities_keywords_ar'])
+                                        ? AdminHelper::wrapLang($data['activities_keywords_en'], $data['activities_keywords_ar'])
+                                        : ($oldMetas['activities']['keywords'][0] ?? null)
+                                ],
+                            ],
+
+                            "main" => [
+                                "title" => [
+                                    isset($data['main_title_en'], $data['main_title_ar'])
+                                        ? AdminHelper::wrapLang($data['main_title_en'], $data['main_title_ar'])
+                                        : ($oldMetas['main']['title'][0] ?? null)
+                                ],
+                                "description" => [
+                                    isset($data['main_description_en'], $data['main_description_ar'])
+                                        ? AdminHelper::wrapLang($data['main_description_en'], $data['main_description_ar'])
+                                        : ($oldMetas['main']['description'][0] ?? null)
+                                ],
+                                "keywords" => [
+                                    isset($data['main_keywords_en'], $data['main_keywords_ar'])
+                                        ? AdminHelper::wrapLang($data['main_keywords_en'], $data['main_keywords_ar'])
+                                        : ($oldMetas['main']['keywords'][0] ?? null)
+                                ],
+                            ]
+                        ];
+
+                        $serializedMetas = serialize($metas);
+
+                    /**
+                     * 
+                     * 
+                     * END SECTION OF METAS 
+                     * 
+                     * 
+                     */
+
+                    /**
+                     * 
+                     * START SECTION OF ACTIVITIES BANNER
+                     * 
+                     */
+                $activities_main_banner_path = $province->banner_activities ?? null;
+                $banner_activities_alt_text = $province->banner_activities_alt_text ?? null;
+                     if (isset($data['banner_activities']) && $data['banner_activities'] instanceof \Illuminate\Http\UploadedFile ) 
+                        {
+
+                            $year = date('Y');   
+                            $month = date('m'); 
+
+                            $folderPath = public_path("wp-content/uploads/{$year}/{$month}");
+
+                            if (!file_exists($folderPath)) {
+                                mkdir($folderPath, 0777, true);
+                            }
+
+                            $ActivitiesBanner = time().'_'.uniqid().'.'.$data['banner_activities']->extension();
+
+                            $data['banner_activities']->move($folderPath, $ActivitiesBanner);
+
+                            $activities_main_banner_path = "wp-content/uploads/{$year}/{$month}/{$ActivitiesBanner}";
+
+                            $banners_activities_main_banner_alt_en = $data['banner_activities_alt_text_en'] ?? null;
+                            $banners_activities_main_banner_alt_ar = $data['banner_activities_alt_text_ar'] ?? null;
+
+                            $banner_activities_alt_text = AdminHelper::wrapLang($banners_activities_main_banner_alt_en, $banners_activities_main_banner_alt_ar);
+
+                        }
+                    if(isset($data['banner_activities']) || isset($data['main_banner'])) 
+                        {
+                                $banners=[
+                                    "activities"=>[
+                                        "main_banner" => $activities_main_banner_path ?? null,
+                                        "main_banner_alt" => $banner_activities_alt_text ?? null
+                                    ],
+                                    "main"=>[
+                                        "main_banner" => $banner_path?? null,
+                                        "main_banner_alt" =>$banner_alt_text ?? null
+                                    ],
+                                    "restaurants"=> [
+                                        "main_banner" => $restaurants_main_banner_path ?? null,
+                                        "carousel_banner" => $restaurants_carousel_banner_path ?? null,
+                                        "video_banner" => $restaurants_video_banner_path ?? null,
+                                        "main_banner_alt" => $restaurants_main_banner_alt_text ?? null
+                                    ]
+
+
+                                ];
+                                $serialized_banner = serialize($banners);
+                        }
+                    /**
+                     * 
+                     * END SECTION OF ACTIVITIES BANNER
+                     * 
+                     */
+
+
+                    /***
+                         * 
+                         * Start Section OF Categories LIST 
+                         * 
+                         */
+                $categories_list = $province->categories_list ?? [];
+
+                if (isset($data['categories_list'] ) && is_array($data['categories_list'])) 
+                    {
+                        foreach ($data['categories_list'] as $parentId => $childIds) 
+                            {
+                            $parentExists = DB::table('wp_packages_main_category')
+                                ->where('id', $parentId)
+                                ->exists();
+
+                            if (!$parentExists) {
+                                continue;
+                            }
+
+                            $validChildren = DB::table('wp_adventure_type')
+                                ->where('category_id', $parentId)
+                                ->whereIn('id', $childIds)
+                                ->pluck('id')
+                                ->toArray();
+
+                            if (empty($validChildren)) {
+                                continue;
+                            }
+
+                            $childrenArray = [];
+                            foreach ($validChildren as $childId) {
+                                $childrenArray[$childId] = (string) $childId;
+                            }
+
+                            $categories_list[$parentId] = $childrenArray;
+                            }
+                    }
+
+            if (AdminHelper::isSerialized($categories_list)) {
+                $Categories_serialized = $categories_list;
+            } else {
+                $Categories_serialized = serialize($categories_list);
+                }
+
+        
+            /***
+             * 
+             * END SECTION OF Categories LIST 
+             */
+
+
+            /**
+             * Start Footers SECTION
+             */
+                    
+                $oldFooters = $province->footers ? unserialize($province->footers) : [];
+
+                // Activities
+                $footers_activities_titles_final = isset($data['footers_activities_titles_en'], $data['footers_activities_titles_ar'])
+                    ? AdminHelper::wrapLang($data['footers_activities_titles_en'], $data['footers_activities_titles_ar'])
+                    : ($oldFooters['activities']['footer_titles'] ?? '');
+
+                $footers_activities_anchor_texts_final = isset($data['footers_activities_anchor_texts_en'], $data['footers_activities_anchor_texts_ar'])
+                    ? AdminHelper::wrapLang($data['footers_activities_anchor_texts_en'], $data['footers_activities_anchor_texts_ar'])
+                    : ($oldFooters['activities']['anchor_texts'] ?? []);
+
+                $footers_activities_anchor_links_final = isset($data['footers_activities_anchor_links_en'], $data['footers_activities_anchor_links_ar'])
+                    ? AdminHelper::wrapLang($data['footers_activities_anchor_links_en'], $data['footers_activities_anchor_links_ar'])
+                    : ($oldFooters['activities']['anchor_links'] ?? []);
+
+                // Restaurants
+                $footers_restaurants_titles_final = isset($data['footers_restaurants_titles_en'], $data['footers_restaurants_titles_ar'])
+                    ? AdminHelper::wrapLang($data['footers_restaurants_titles_en'], $data['footers_restaurants_titles_ar'])
+                    : ($oldFooters['restaurants']['footer_titles'] ?? '');
+
+                $footers_restaurants_anchor_texts_final = isset($data['footers_restaurants_anchor_texts_en'], $data['footers_restaurants_anchor_texts_ar'])
+                    ? AdminHelper::wrapLang($data['footers_restaurants_anchor_texts_en'], $data['footers_restaurants_anchor_texts_ar'])
+                    : ($oldFooters['restaurants']['anchor_texts'] ?? []);
+
+                $footers_restaurants_anchor_links_final = isset($data['footers_restaurants_anchor_links_en'], $data['footers_restaurants_anchor_links_ar'])
+                    ? AdminHelper::wrapLang($data['footers_restaurants_anchor_links_en'], $data['footers_restaurants_anchor_links_ar'])
+                    : ($oldFooters['restaurants']['anchor_links'] ?? []);
+
+                // Main
+                $footers_main_titles_final = isset($data['footers_main_titles_en'], $data['footers_main_titles_ar'])
+                    ? AdminHelper::wrapLang($data['footers_main_titles_en'], $data['footers_main_titles_ar'])
+                    : ($oldFooters['main']['footer_titles'] ?? '');
+
+                $footers_main_anchor_texts_final = isset($data['footers_main_anchor_texts_en'], $data['footers_main_anchor_texts_ar'])
+                    ? AdminHelper::wrapLang($data['footers_main_anchor_texts_en'], $data['footers_main_anchor_texts_ar'])
+                    : ($oldFooters['main']['anchor_texts'] ?? []);
+
+                $footers_main_anchor_links_final = isset($data['footers_main_anchor_links_en'], $data['footers_main_anchor_links_ar'])
+                    ? AdminHelper::wrapLang($data['footers_main_anchor_links_en'], $data['footers_main_anchor_links_ar'])
+                    : ($oldFooters['main']['anchor_links'] ?? []);
+
+
+                // build footers
+                $footers = [
+                    "activities" => [   
+                        "footer_titles" => $footers_activities_titles_final,
+                        "anchor_texts"  => $footers_activities_anchor_texts_final,
+                        "anchor_links"  => $footers_activities_anchor_links_final,
+                    ],
+                    "restaurants" => [
+                        "footer_titles" => $footers_restaurants_titles_final,
+                        "anchor_texts"  => $footers_restaurants_anchor_texts_final,
+                        "anchor_links"  => $footers_restaurants_anchor_links_final,
+                    ],
+                    "main" => [
+                        "footer_titles" => $footers_main_titles_final,
+                        "anchor_texts"  => $footers_main_anchor_texts_final,
+                        "anchor_links"  => $footers_main_anchor_links_final,
+                    ]
+                ];
+
+                $Footers_encoded = serialize($footers);
+
+
+                            /**
+                             * 
+                             * END FOOTERS SECTION
+                             */
+
+            $NewProvince=new province();
+ 
+
+            $NewProvince->update([
+                'country_id' => $country_id,
+                'province_code' => $province_code,
+                'name' => $name,
+                'name_ar' => $name_ar,
+                'title' => $title,
+                'title_ar' => $title_ar,
+                'banner' => $banner_path,
+                'banner_alt_text' => $banner_alt_text,
+                'banner_activities' => $activities_main_banner_path,
+                'banner_activities_alt_text' => $banner_activities_alt_text,
+                'faq' => $faq_serialized,
+                'categories_list' => $Categories_serialized,
+                'google_map' => $google_map,
+                'slug' => $slug,
+                'search_query' => $search_query,
+                'search_query_ar' => $search_query_ar,
+                'status' => $status,
+                'banners' => $serialized_banner,
+                'footers' => $Footers_encoded,
+                'metas' => $serializedMetas
+            ]);
+            return response()->json([
+                'success' => true,
+                'data'    => $province
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error'   => 'Something went wrong!',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
+    public function deleteProvince($id)
+    {
+        try {
+            $province = Province::findOrFail($id);
+            $province->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Province deleted successfully!'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error'   => 'Something went wrong!',
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
 
