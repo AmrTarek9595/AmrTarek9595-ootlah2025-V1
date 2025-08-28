@@ -22,13 +22,13 @@ class AddNewCountry extends FormRequest
     public function rules(): array
     {
         return [
-                'name' => 'sometimes|string|max:255',
-                'name_ar' => 'sometimes|string|max:255',
-                'title' => 'sometimes|string|max:255',
-                'title_ar' => 'sometimes|string|max:255',
-                'continent' => 'sometimes|in:0,1,2,3,4',//	0 = Asia | 1 = Europe | 2 = Africa | 3 = America | 4 = Oceania	
-                'country_code' => 'sometimes|string|max:255',
-                'timezone' => 'sometimes|string|max:255',
+                'name' => 'required|string|max:255',
+                'name_ar' => 'required|string|max:255',
+                'title' => 'required|string|max:255',
+                'title_ar' => 'required|string|max:255',
+                'continent' => 'required|in:0,1,2,3,4',//	0 = Asia | 1 = Europe | 2 = Africa | 3 = America | 4 = Oceania	
+                'country_code' => 'required|string|max:255',
+                'timezone' => 'required|string|max:255',
                 'whatsapp_number' => 'sometimes|string|max:11',
                 'google_map'=>'sometimes|string|max:11',
                 "currency_en"=>"sometimes|string|max:255",
@@ -37,16 +37,16 @@ class AddNewCountry extends FormRequest
                 'slug' => 'sometimes|string|max:255',
                 'search_query' => 'sometimes|string|max:255',
                 'search_query_ar' => 'sometimes|string|max:255',
-                'meta_title' => 'sometimes|string|max:255',
-                'meta_description'  => 'sometimes|string|max:255',
-                'meta_title_activities' => 'sometimes|string|max:255',
-                'meta_description_activities' => 'sometimes|string|max:255',
+                // 'meta_title' => 'sometimes|string|max:255',
+                // 'meta_description'  => 'sometimes|string|max:255',
+                // 'meta_title_activities' => 'sometimes|string|max:255',
+                // 'meta_description_activities' => 'sometimes|string|max:255',
 
-                'meta_title_packages' => 'sometimes|string|max:255',
-                'meta_description_packages' => 'sometimes|string|max:255',
+                // 'meta_title_packages' => 'sometimes|string|max:255',
+                // 'meta_description_packages' => 'sometimes|string|max:255',
 
-                'meta_title_hotels' =>  'sometimes|string|max:255',
-                'meta_description_hotels' => 'sometimes|string|max:255',
+                // 'meta_title_hotels' =>  'sometimes|string|max:255',
+                // 'meta_description_hotels' => 'sometimes|string|max:255',
                 'status' => 'sometimes|in:0,1', //0 = no | 1 = yes,
 
                 /**Banner Params */
@@ -54,6 +54,11 @@ class AddNewCountry extends FormRequest
                 "banner_alt_text_ar"=>"sometimes|string|max:255",
                 'banner_image' => 'sometimes|file|mimes:jpeg,png,jpg,webp|max:2048',
                 /**End Banner Params */
+                /**Banner Activities Params */
+                "banner_alt_text_en"=>"sometimes|string|max:255",
+                "banner_alt_text_ar"=>"sometimes|string|max:255",
+                'banner_image' => 'sometimes|file|mimes:jpeg,png,jpg,webp|max:2048',
+                /**End Banner Activities Params */
 
             // 'faq'=>'sometimes|base64',//accept base64 encoded array
                 /**
@@ -125,9 +130,28 @@ class AddNewCountry extends FormRequest
                 "banners_main_main_banner_alt_en"=> "sometimes|string|max:255",
                 "banners_main_main_banner_alt_ar"=> "sometimes|string|max:255",
      
-
-
                 /**End Bannares Params */
+
+
+
+                /**Start Metas Section  */
+
+                "activities_title_en" => "sometimes|string|max:255",
+                "activities_title_ar" => "sometimes|string|max:255",
+                "activities_description_en" => "sometimes|string|max:255",
+                "activities_description_ar" => "sometimes|string|max:255",
+                "activities_keywords_en" => "sometimes|string|max:255",
+                "activities_keywords_ar" => "sometimes|string|max:255",
+
+
+
+                 "main_title_en" => "sometimes|string|max:255",
+                "main_title_ar" => "sometimes|string|max:255",
+                "main_description_en" => "sometimes|string|max:255",
+                "main_description_ar" => "sometimes|string|max:255",
+                "main_keywords_en" => "sometimes|string|max:255",
+                "main_keywords_ar" => "sometimes|string|max:255",
+
 
 
 

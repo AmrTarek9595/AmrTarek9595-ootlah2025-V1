@@ -229,19 +229,19 @@ class AdminService
         : '';
       
         $country['currency']=!empty($country['currency'])? AdminHelper::decodeLangString($country['currency']):'';
-        $country['meta_title']=!empty($country['meta_title']) ? AdminHelper::decodeLangString($country['meta_title']):'';
-        $country['meta_description']=!empty($country['meta_description']) ?AdminHelper::decodeLangString($country['meta_description']):'';
-        $country['meta_keywords']=!empty($country['meta_keywords']) ?   AdminHelper::decodeLangString($country['meta_keywords']):'';
-        $country['meta_title_activities']=!empty($country['meta_title_activities']) ?   AdminHelper::decodeLangString($country['meta_title_activities']): '';
-        $country['meta_description_activities']=!empty($country['meta_description_activities']) ?   AdminHelper::decodeLangString($country['meta_description_activities']):'';
-        $country['meta_title_packages']=!empty($country['meta_title_packages']) ?   AdminHelper::decodeLangString($country['meta_title_packages']):'';
-        $country['meta_title_hotels']=!empty($country['meta_title_hotels']) ?   AdminHelper::decodeLangString($country['meta_title_hotels']) : '';
-        $country['meta_description_packages']=!empty($country['meta_description_packages']) ? AdminHelper::decodeLangString($country['meta_description_packages']):'';
-        $country['meta_description_hotels']=!empty($country['meta_description_hotels']) ? AdminHelper::decodeLangString($country['meta_description_hotels']):'';
+        // $country['meta_title']=!empty($country['meta_title']) ? AdminHelper::decodeLangString($country['meta_title']):'';
+        // $country['meta_description']=!empty($country['meta_description']) ?AdminHelper::decodeLangString($country['meta_description']):'';
+        // $country['meta_keywords']=!empty($country['meta_keywords']) ?   AdminHelper::decodeLangString($country['meta_keywords']):'';
+        // $country['meta_title_activities']=!empty($country['meta_title_activities']) ?   AdminHelper::decodeLangString($country['meta_title_activities']): '';
+        // $country['meta_description_activities']=!empty($country['meta_description_activities']) ?   AdminHelper::decodeLangString($country['meta_description_activities']):'';
+        // $country['meta_title_packages']=!empty($country['meta_title_packages']) ?   AdminHelper::decodeLangString($country['meta_title_packages']):'';
+        // $country['meta_title_hotels']=!empty($country['meta_title_hotels']) ?   AdminHelper::decodeLangString($country['meta_title_hotels']) : '';
+        // $country['meta_description_packages']=!empty($country['meta_description_packages']) ? AdminHelper::decodeLangString($country['meta_description_packages']):'';
+        // $country['meta_description_hotels']=!empty($country['meta_description_hotels']) ? AdminHelper::decodeLangString($country['meta_description_hotels']):'';
         $country['footer_links']=!empty($country['footer_links'])? AdminHelper::deepUnserializeCategiry_List($country['footer_links']):'    ';
         $country['banners']=!empty($country['banners'])? AdminHelper::deepUnserializeCategiry_List($country['banners']):'';
         $country['footers']=!empty($country['footers'])? AdminHelper::deepDecodeFooter($country['footers']):'';
-
+        $country['metas']=!empty($country['metas'])? AdminHelper::deepUnserializeCategiry_List($country['metas']):'';
         return response()->json(['country' => $country], 200);
 
     }
@@ -314,7 +314,9 @@ class AdminService
         if (!empty($country->footers)) {
             $country['footers']=AdminHelper::deepDecodeFooter($country['footers']);
         }
-
+        if (!empty($country->metas)) {
+            $country['metas']=!empty($country['metas'])? AdminHelper::deepUnserializeCategiry_List($country['metas']):'';
+        }
         
 
         if (!empty($country->categories_list)) {
@@ -436,14 +438,14 @@ class AdminService
             $slug=$data['slug'] ?? null;
             $search_query=$data['search_query'] ?? null;
             $search_query_ar=$data['search_query_ar']     ?? null;
-            $meta_title=$data['meta_title'] ?? null;
-            $meta_description=$data['meta_description'] ?? null;
-            $meta_title_activities=$data['meta_title_activities'] ?? null;
-            $meta_description_activities=$data['meta_description_activities'] ?? null;
-            $meta_title_packages=$data['meta_title_packages'] ?? null;
-            $meta_description_packages=$data['meta_description_packages'] ?? null;
-            $meta_title_hotels=$data['meta_title_hotels'] ?? null;
-            $meta_description_hotels=$data['meta_description_hotels'] ?? null;
+            // $meta_title=$data['meta_title'] ?? null;
+            // $meta_description=$data['meta_description'] ?? null;
+            // $meta_title_activities=$data['meta_title_activities'] ?? null;
+            // $meta_description_activities=$data['meta_description_activities'] ?? null;
+            // $meta_title_packages=$data['meta_title_packages'] ?? null;
+            // $meta_description_packages=$data['meta_description_packages'] ?? null;
+            // $meta_title_hotels=$data['meta_title_hotels'] ?? null;
+            // $meta_description_hotels=$data['meta_description_hotels'] ?? null;
 
             $status=$data['status'] ?? 0;
 
@@ -511,6 +513,7 @@ class AdminService
                     $banners_activities_main_banner_alt_ar = $data['banners_activities_main_banner_alt_ar'];
                     $banners_activities_carousel_banner_alt_en = $data['banners_activities_carousel_banner_alt_en'] ?? null;
                     $banners_activities_carousel_banner_alt_ar = $data['banners_activities_carousel_banner_alt_ar']?? null;
+                    $banner_activities_alt_text = "[en]".$data['banners_activities_main_banner_alt_en']."[en]"."[ar]".$data['banners_activities_main_banner_alt_ar']. "[ar]";
 
 
                 }
@@ -788,6 +791,36 @@ class AdminService
 
             $Footers_encoded = serialize($footers);
 
+                                $metas = [
+                        "activities" => [
+                            "title" => [
+                                AdminHelper::wrapLang($data['activities_title_en'] ?? null, $data['activities_title_ar'] ?? null)
+                            ],
+                            "description" => [
+                                AdminHelper::wrapLang($data['activities_description_en'] ?? null, $data['activities_description_ar'] ?? null)
+                            ],
+                            "keywords" => [
+                                AdminHelper::wrapLang($data['activities_keywords_en'] ?? null, $data['activities_keywords_ar'] ?? null)
+                            ]
+                        ],
+
+
+
+                        "main" => [
+                            "title" => [
+                                AdminHelper::wrapLang($data['main_title_en'] ?? null, $data['main_title_ar'] ?? null)
+                            ],
+                            "description" => [
+                                AdminHelper::wrapLang($data['main_description_en'] ?? null, $data['main_description_ar'] ?? null)
+                            ],
+                            "keywords" => [
+                                AdminHelper::wrapLang($data['main_keywords_en'] ?? null, $data['main_keywords_ar'] ?? null)
+                            ]
+                        ]
+                            ];
+                    $serializedMetas = serialize($metas);
+
+
             $country=new country();
             $country->name = $name;
             $country->name_ar = $name_ar;
@@ -797,13 +830,17 @@ class AdminService
             $country->country_code=$country_code;
             $country->timezone=$timezone;
             $country->whatsapp_number=$whatsapp_number;
-            if(!empty($banner_path)
-                )
+            if(!empty($banner_path))
             {
             $country->banner=$banner_path;
 
             }
-            $country->banner_alt_text=$banner_alt_text??null;
+             $country->banner_alt_text=$banner_alt_text??null;
+            if(!empty($activities_main_banner_path))
+            {
+                $country->banner_activities=$activities_main_banner_path;
+            }
+            $country->banner_activities_alt_text=$banner_activities_alt_text??null;
             $country->faq=$faq_serialized;
             $country->categories_list=$Categories_serialized;
             $country->google_map=$google_map;
@@ -811,18 +848,19 @@ class AdminService
             $country->is_gcc=$is_gcc;
             $country->slug=$slug;
             $country->search_query=$search_query;$country->search_query_ar=$search_query_ar;
-            $country->meta_title=$meta_title;$country->meta_description=$meta_description;
-            $country->meta_title_activities=$meta_title_activities;
-            $country->meta_description_activities=$meta_description_activities;
-            $country->meta_title_packages=$meta_title_packages;
-            $country->meta_description_packages=$meta_description_packages;
-            $country->meta_title_hotels=$meta_title_hotels;
-            $country->meta_description_hotels=$meta_description_hotels;
+            // $country->meta_title=$meta_title;
+            // $country->meta_description=$meta_description;
+            // $country->meta_title_activities=$meta_title_activities;
+            // $country->meta_description_activities=$meta_description_activities;
+            // $country->meta_title_packages=$meta_title_packages;
+            // $country->meta_description_packages=$meta_description_packages;
+            // $country->meta_title_hotels=$meta_title_hotels;
+            // $country->meta_description_hotels=$meta_description_hotels;
             $country->status=$status;
             $country->banners=$serializedBanners;
             $country->footers=$Footers_encoded;
 
-
+        $country->metas=$serializedMetas;
 
 
 
@@ -1117,7 +1155,34 @@ class AdminService
                  * END SECTION OF Categories LIST 
                  */
 
+                    $metas = [
+                        "activities" => [
+                            "title" => [
+                                AdminHelper::wrapLang($data['activities_title_en'] ?? null, $data['activities_title_ar'] ?? null)
+                            ],
+                            "description" => [
+                                AdminHelper::wrapLang($data['activities_description_en'] ?? null, $data['activities_description_ar'] ?? null)
+                            ],
+                            "keywords" => [
+                                AdminHelper::wrapLang($data['activities_keywords_en'] ?? null, $data['activities_keywords_ar'] ?? null)
+                            ]
+                        ],
 
+
+
+                        "main" => [
+                            "title" => [
+                                AdminHelper::wrapLang($data['main_title_en'] ?? null, $data['main_title_ar'] ?? null)
+                            ],
+                            "description" => [
+                                AdminHelper::wrapLang($data['main_description_en'] ?? null, $data['main_description_ar'] ?? null)
+                            ],
+                            "keywords" => [
+                                AdminHelper::wrapLang($data['main_keywords_en'] ?? null, $data['main_keywords_ar'] ?? null)
+                            ]
+                        ]
+                        ];
+                    $serializedMetas = serialize($metas);
 
 
                 $footers_activities_titles_final = AdminHelper::wrapLang(
@@ -1207,6 +1272,10 @@ class AdminService
                 'status'          => $status,
                 'banner'    => $banner_path,
                 'banner_alt_text' => $banner_alt_text,
+                'banner_activities' => $activities_main_banner_path,
+                'banner_activities_alt_text' => "[en]".($banners_activities_carousel_banner_alt_en ?? '')."[en]"
+                                    ."[ar]".($banners_activities_carousel_banner_alt_ar ?? '')."[ar]",
+                'metas' => !empty($serializedMetas) ? $serializedMetas : $country->metas,
             // 'banners'         => !empty($serializedBanners) ? $serializedBanners : $country->banners,
                 'faq'             => !empty($faq_serialized) ? $faq_serialized : $country->faq,
                 'categories_list' => !empty($Categories_serialized) ? $Categories_serialized : $country->categories_list,
@@ -1226,7 +1295,7 @@ class AdminService
     public function deleteCountry(int $id)
     {    
         try {
-            $country = Country::find($id);
+            $country = Country::findOrFail($id);
             if (!$country) {
                 return response()->json(['error' => 'Country not found'], 404);
             }
@@ -2328,6 +2397,7 @@ class AdminService
             ], 500);
         }
     }
+
     public function deleteProvince($id)
     {
         try {
