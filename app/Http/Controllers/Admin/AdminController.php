@@ -11,6 +11,8 @@ use App\Http\Requests\Admin\AddNewUser;
 use App\Http\Requests\Admin\UpdateUserData;
 use App\Http\Requests\Admin\AddNewCountry;
 use App\Http\Requests\Admin\AddNewProvince;
+
+use App\Http\Requests\Admin\AddNewCity;
 use App\Helper\AdminHelper;
 use App\Models\Country;
 class AdminController extends Controller
@@ -142,7 +144,27 @@ class AdminController extends Controller
     {
         return $this->adminService->deleteProvince($id);
     }
+    /**
+     * 
+     * END OF PROVINCES SECTION
+     */
 
+    public function getCustomCity($id)
+    {
+        return $this->adminService->getCustomCity($id);
+    }
+
+    public function GetAllCities()
+    {
+        return $this->adminService->GetAllCities();
+    }
+    public function AddNewCity (AddNewCity $request){
+        return $this->adminService->AddNewCity($request->validated());
+    }
+    public function updateCity($id, AddNewCity $request)
+    {
+        return $this->adminService->updateCity($id, $request->validated());
+    }
 
 
 

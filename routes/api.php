@@ -67,5 +67,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::delete('/deleteprovince/{id}', [AdminController::class, 'deleteProvince']); // Delete Province by ID
 
     });
+
+             Route::prefix('admin/countries/provinces/city')->middleware(['Role:administrator'])->group(function () {
+            Route::get('/getcustomcity/{id}', [AdminController::class, 'getCustomCity']); // Return Custom Cities
+            Route::get('/getallcities', [AdminController::class, 'GetAllCities']); // Get All Cities
+            Route::post('/addnewcity', [AdminController::class, 'addNewCity']); // Add a new City
+            Route::put('/updatecity/{id}', [AdminController::class, 'updateCity']); // Update City
+            // Route::delete('/deleteprovince/{id}', [AdminController::class, 'deleteProvince']); // Delete Province by ID
+
+    });
 });
    

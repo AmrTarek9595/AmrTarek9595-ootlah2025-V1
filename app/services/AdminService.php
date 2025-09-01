@@ -6,6 +6,7 @@ use App\Models\UserRole;
 use App\Models\User;
 use App\Models\Country;
 use App\Models\province;
+use App\Models\City;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -1548,7 +1549,6 @@ class AdminService
                 ];
             }
 
-            // هنا تخزن النتيجة جوة الكاونتري
             $province->categories_list = $categories_list;
                     $province['metas']=!empty($province['metas'])? AdminHelper::deepUnserializeCategiry_List($province['metas']):'';
         // unset($province['metas']);
@@ -2415,7 +2415,1273 @@ class AdminService
             ], 500);
         }
     }
+/**
+ * 
+ * END SECTION PF PROVINCES
+ */
 
+public function getCustomCity($id)
+{
+    $city = City::with(['provinces'=>function($query){
+        $query->select('id','name','name_ar','province_code','country_id');
+    },'provinces.country'=>function($query){
+        $query->select('id','name','name_ar','country_code');
+
+    }])->findOrFail($id);
+    $city->banner_activities_alt_text=AdminHelper::decodeLangString($city->banner_activities_alt_text);
+
+    $city->seo_overview=AdminHelper::deepDecodeFooter($city->seo_overview);
+
+    $city->seo_content_head=AdminHelper::deepDecodeFooter($city->seo_content_head);
+    $city->seo_content_listing=AdminHelper::deepDecodeFooter($city->seo_content_listing);
+    $city->seo_listing=AdminHelper::deepDecodeFooter($city->seo_listing);
+    $city->faq=AdminHelper::deepDecodeFooter($city->faq);
+
+
+
+
+
+    if (!empty($city->categories_list)) 
+        {
+                    $data = AdminHelper::deepUnserializeCategiry_List($city->categories_list);
+        }
+        
+            $categories_list = [];
+            if(!empty($data))
+            {
+                foreach ($data as $parentId => $childIds) {
+                    $parent = DB::table('wp_packages_main_category')
+                        ->where('id', $parentId)
+                        ->select('id', 'name')
+                        ->first();
+
+                    if (!$parent) continue;
+
+                    $children = [];
+                    if (is_array($childIds) && count($childIds)) {
+                        $children = DB::table('wp_adventure_type')
+                            ->whereIn('id', $childIds)
+                            ->select('id', 'name')
+                            ->get();
+                    }
+
+                    $categories_list[] = [
+                        'parent' => $parent,
+                        'children' => $children
+                    ];
+                }
+            }
+    $city->categories_list = $categories_list; 
+            $city->google_map = !empty($city->google_map)
+            ? unserialize($city->google_map)
+            : '';
+
+            $city->price_info=!empty($city->price_info)
+            ? unserialize($city->price_info)
+            : '';
+            $city->meta_title=!empty($city->meta_title) ? AdminHelper::decodeLangString($city->meta_title):'';
+            $city->meta_description=!empty($city->meta_description) ?AdminHelper::decodeLangString($city->meta_description):'';
+            $city->meta_keywords=!empty($city->meta_keywords) ?   AdminHelper::decodeLangString($city->meta_keywords):'';
+
+
+            $city->meta_title_activities=!empty($city->meta_title_activities) ? AdminHelper::decodeLangString($city->meta_title_activities):'';
+            $city->meta_description_activities=!empty($city->meta_description_activities) ?AdminHelper::decodeLangString($city->meta_description_activities):'';
+            $city->meta_keywords_activities=!empty($city->meta_keywords_activities) ?   AdminHelper::decodeLangString($city->meta_keywords_activities):'';
+            // $city->footers=!empty($city->footers)? AdminHelper::deepDecodeFooter($city->footers):'';
+            $city->footer_links=!empty($city->footer_links)? AdminHelper::deepDecodeFooter($city->footer_links):'';
+
+    unset($city->categories_list_packages);
+    unset($city->categories);
+    unset($city->metas);
+
+    return response()->json([
+    'success' => true,
+    'data'    => $city
+    ]);
+}
+
+
+public function GetAllCities(){
+    $cities = City::with(['provinces'=>function ($query){
+         $query->select('id','name','name_ar','province_code','country_id');
+    },'provinces.country'=>function($query){
+        $query->select('id','name','name_ar','country_code');
+    }])->paginate(10);
+
+
+     $cities->transform(function ($city) {
+        $city['banner_activities_alt_text']=AdminHelper::decodeLangString($city['banner_activities_alt_text']);
+
+    $city->seo_overview=AdminHelper::deepDecodeFooter($city->seo_overview);
+
+    $city->seo_content_head=AdminHelper::deepDecodeFooter($city->seo_content_head);
+    $city->seo_content_listing=AdminHelper::deepDecodeFooter($city->seo_content_listing);
+    $city->seo_listing=AdminHelper::deepDecodeFooter($city->seo_listing);
+    $city->faq=AdminHelper::deepDecodeFooter($city->faq);
+
+            $city->footer_links=!empty($city->footer_links)? AdminHelper::deepDecodeFooter($city->footer_links):'';
+
+unset($city->footers);
+
+    if (!empty($city->categories_list)) 
+        {
+                    $data = AdminHelper::deepUnserializeCategiry_List($city->categories_list);
+        }
+        
+            $categories_list = [];
+            if(!empty($data))
+            {
+                foreach ($data as $parentId => $childIds) {
+                    $parent = DB::table('wp_packages_main_category')
+                        ->where('id', $parentId)
+                        ->select('id', 'name')
+                        ->first();
+
+                    if (!$parent) continue;
+
+                    $children = [];
+                    if (is_array($childIds) && count($childIds)) {
+                        $children = DB::table('wp_adventure_type')
+                            ->whereIn('id', $childIds)
+                            ->select('id', 'name')
+                            ->get();
+                    }
+
+                    $categories_list[] = [
+                        'parent' => $parent,
+                        'children' => $children
+                    ];
+                }
+            }
+    $city->categories_list = $categories_list; 
+            $city->google_map = !empty($city->google_map)
+            ? unserialize($city->google_map)
+            : '';
+
+            $city->price_info=!empty($city->price_info)
+            ? unserialize($city->price_info)
+            : '';
+            $city->meta_title=!empty($city->meta_title) ? AdminHelper::decodeLangString($city->meta_title):'';
+            $city->meta_description=!empty($city->meta_description) ?AdminHelper::decodeLangString($city->meta_description):'';
+            $city->meta_keywords=!empty($city->meta_keywords) ?   AdminHelper::decodeLangString($city->meta_keywords):'';
+
+
+            $city->meta_title_activities=!empty($city->meta_title_activities) ? AdminHelper::decodeLangString($city->meta_title_activities):'';
+            $city->meta_description_activities=!empty($city->meta_description_activities) ?AdminHelper::decodeLangString($city->meta_description_activities):'';
+            $city->meta_keywords_activities=!empty($city->meta_keywords_activities) ?   AdminHelper::decodeLangString($city->meta_keywords_activities):'';
+            // $city->footers=!empty($city->footers)? AdminHelper::deepDecodeFooter($city->footers):'';
+
+    unset($city->categories_list_packages);
+    unset($city->categories);
+    unset($city->metas);
+
+        return $city;
+     }
+
+    );
+    return response()->json([
+        'success' => true,
+        'data'    => $cities
+    ]);
+}
+
+
+public function AddNewCity(array $data)
+{
+    /**
+     * 
+     * PARAMETERS
+     * 1-city_code
+     * 2-name
+     * 3-name_ar
+     * 4-title
+     * 5-title_ar
+     * 6-main_banner_path
+     * 7-main_banner_alt_text
+     * 8-activities_banner_alt_text
+     * 9-activities_banner_path
+     * 10- resturants_banner_path
+     * 11- resturants_banner_alt_text
+     * 12- video_activities_path
+     * 13-final_seo_overview
+     * 14-Seo_listing_finalize
+     * 15-seo_content_head
+     * 16-finalSEO_CONTENT_LISTING
+     * 17-faq_serialized
+     * 18-Categories_serialized
+     * 19-google_map
+     * 20-currency
+     * 21-Slug
+     * 22-slug_province_city
+     * 23-search_query_ar
+     * 24-search_query
+     * 25-Meta_title
+     * 26-Meta_Description
+     * 27-Meta_Keywords
+     * 28-Meta_title_activities
+     * 29-Meta_Description_activities
+     * 30-Meta_Keywords_activities
+     * 31-Footers_encoded
+     * 32-Status
+     * 
+     * 
+     */
+
+    
+
+    try{
+
+
+            $province_id=Province::where('id',$data['province_id'])->first();
+            $city_code=$data['city_code'];
+            $name=$data['name'];
+            $name_ar=$data['name_ar'];
+            $title=$data['title'];
+            $title_ar=$data['title_ar'];
+            if (isset($data['banner_image']) && $data['banner_image'] instanceof \Illuminate\Http\UploadedFile) 
+                {
+
+                    $year = date('Y');   
+                    $month = date('m'); 
+
+                    $folderPath = public_path("wp-content/uploads/{$year}/{$month}");
+
+                    if (!file_exists($folderPath)) {
+                        mkdir($folderPath, 0777, true);
+                    }
+
+                    $MainBannerPath = time().'_'.uniqid().'.'.$data['banner_image']->extension();
+
+                    $data['banner_image']->move($folderPath, $MainBannerPath);
+
+                    $main_banner_path = "wp-content/uploads/{$year}/{$month}/{$MainBannerPath}";
+                    $main_banner_alt_text = "[en]".($data['banner_alt_text_en']??'')."[en]"."[ar]".($data['banner_alt_text_ar']??'')."[ar]";
+
+
+                }
+
+            if (isset($data['banner_activities_image']) && $data['banner_activities_image'] instanceof \Illuminate\Http\UploadedFile) 
+                {
+
+                    $year = date('Y');   
+                    $month = date('m'); 
+
+                    $folderPath = public_path("wp-content/uploads/{$year}/{$month}");
+
+                    if (!file_exists($folderPath)) {
+                        mkdir($folderPath, 0777, true);
+                    }
+
+                    $ActivitiesBannerPath = time().'_'.uniqid().'.'.$data['banner_activities_image']->extension();
+
+                    $data['banner_activities_image']->move($folderPath, $ActivitiesBannerPath);
+
+                    $activities_banner_path = "wp-content/uploads/{$year}/{$month}/{$ActivitiesBannerPath}";
+                    $activities_banner_alt_text = "[en]".($data['banner_activities_alt_text_en']??'')."[en]"."[ar]".($data['banner_activities_alt_text_ar']??'')."[ar]";
+
+
+                }
+
+            if (isset($data['banner_restaurants_image']) && $data['banner_restaurants_image'] instanceof \Illuminate\Http\UploadedFile) 
+                {
+
+                    $year = date('Y');   
+                    $month = date('m'); 
+
+                    $folderPath = public_path("wp-content/uploads/{$year}/{$month}");
+
+                    if (!file_exists($folderPath)) {
+                        mkdir($folderPath, 0777, true);
+                    }
+
+                    $ResturantsBannerPath = time().'_'.uniqid().'.'.$data['banner_restaurants_image']->extension();
+
+                    $data['banner_restaurants_image']->move($folderPath, $ResturantsBannerPath);
+
+                    $resturants_banner_path = "wp-content/uploads/{$year}/{$month}/{$ResturantsBannerPath}";
+                    $resturants_banner_alt_text = "[en]".($data['banner_restaurants_alt_text_en']??'')."[en]"."[ar]".($data['banner_restaurants_alt_text_ar']??'')."[ar]";
+
+
+                }
+
+                if (isset($data['video_activities']) && $data['video_activities'] instanceof \Illuminate\Http\UploadedFile) 
+                {
+                    $year = date('Y');   
+                    $month = date('m'); 
+
+                    $folderPath = public_path("wp-content/uploads/{$year}/{$month}");
+
+                    if (!file_exists($folderPath)) {
+                        mkdir($folderPath, 0777, true);
+                    }
+
+                    $videoActivitiesName = time() . '_' . uniqid() . '.' . $data['video_activities']->extension();
+
+                    $data['video_activities']->move($folderPath, $videoActivitiesName);
+
+                    $video_activities_path = "wp-content/uploads/{$year}/{$month}/{$videoActivitiesName}";
+
+                }
+
+            if(!empty($data['seo_overview_main_en']) || !empty($data['seo_overview_main_ar']) || !empty($data['seo_overview_activities_en']) || !empty($data['seo_overview_activities_ar']))
+            {
+                $seo_overview=[
+                    "main"=>[
+                    'en'=>$data['seo_overview_main_en']??'',
+                    'ar'=>$data['seo_overview_main_ar']??'',
+                    ],
+                    "activities"=>[
+                        'en'=>$data['seo_overview_activities_en']??'',
+                        'ar'=>$data['seo_overview_activities_ar']??'',
+                    ]
+                ];
+                $final_seo_overview = serialize($seo_overview);
+        
+            }
+
+            if((isset($data['seo_listing_main_pictures']) && $data['seo_listing_main_pictures'] instanceof \Illuminate\Http\UploadedFile))
+            {
+
+                $year = date('Y');
+                $month = date('m'); 
+
+                $folderPath = public_path("wp-content/uploads/{$year}/{$month}");
+
+                if (!file_exists($folderPath)) {
+                    mkdir($folderPath, 0777, true);
+                }
+
+                $SeoListingMainOicture = time().'_'.uniqid().'.'.$data['seo_listing_main_pictures']->extension();
+
+                $data['seo_listing_main_pictures']->move($folderPath, $SeoListingMainOicture);
+
+                $Seo_Listing_main_picture_path = "wp-content/uploads/{$year}/{$month}/{$SeoListingMainOicture}";
+
+                $Seo_Listing_Main_alt_text = "[en]".base64_encode(($data['seo_listing_main_alt_text_en']??' '))."[en]"."[ar]".base64_encode(($data['seo_listing_main_alt_text_ar']??' '))."[ar]";
+
+                $Seo_Listing_Main_names = "[en]".base64_encode(($data['seo_listing_main_names_en']??' '))."[en]"."[ar]".base64_encode(($data['seo_listing_main_names_ar']??' '))."[ar]";
+
+                $Seo_Listing_Main_Contents = "[en]".base64_encode(($data['seo_listing_main_contents_en']??' '))."[en]"."[ar]".base64_encode(($data['seo_listing_main_contents_ar']??' '))."[ar]";
+
+            }
+
+
+            if((isset($data['seo_listing_activities_pictures']) && $data['seo_listing_activities_pictures'] instanceof \Illuminate\Http\UploadedFile))
+            {
+
+                $year = date('Y');
+                $month = date('m'); 
+
+                $folderPath = public_path("wp-content/uploads/{$year}/{$month}");
+
+                if (!file_exists($folderPath)) {
+                    mkdir($folderPath, 0777, true);
+                }
+
+                $SeoListingMainOicture = time().'_'.uniqid().'.'.$data['seo_listing_activities_pictures']->extension();
+
+                $data['seo_listing_activities_pictures']->move($folderPath, $SeoListingMainOicture);
+
+                $Seo_Listing_Activities_picture_path = "wp-content/uploads/{$year}/{$month}/{$SeoListingMainOicture}";
+
+                $Seo_Listing_Activities_alt_text = "[en]".($data['seo_listing_activities_alt_text_en']??' ')."[en]"."[ar]".($data['seo_listing_activities_alt_text_ar']??' ')."[ar]";
+
+                $Seo_Listing_Activities_names = "[en]".($data['seo_listing_activities_names_en']??' ')."[en]"."[ar]".($data['seo_listing_activities_names_ar']??' ')."[ar]";
+
+                $Seo_Listing_Activities_Contents = "[en]".($data['seo_listing_activities_contents_en']??' ')."[en]"."[ar]".($data['seo_listing_activities_contents_ar']??' ')."[ar]";
+
+            }
+
+                $Seo_listing_finalize=serialize([
+                    'main'=>[
+                        'picture'=>[$Seo_Listing_main_picture_path??''],
+                        'alt_text'=>$Seo_Listing_Main_alt_text??'[en][en][ar][ar]',
+                        'names'=>$Seo_Listing_Main_names??'[en][en][ar][ar]',
+                        'contents'=>$Seo_Listing_Main_Contents??'[en][en][ar][ar]',
+                    
+                        ],
+                    'activities'=>[
+                        'picture'=>[$Seo_Listing_Activities_picture_path??''],
+                        'alt_text'=>$Seo_Listing_Activities_alt_text??'[en][en][ar][ar]',
+                        'names'=>$Seo_Listing_Activities_names??'[en][en][ar][ar]',
+                        'contents'=>$Seo_Listing_Activities_Contents??'[en][en][ar][ar]',
+                    ]
+                ]);
+
+
+
+            if(!empty($data['seo_content_head_main_en']) || !empty($data['seo_content_head_main_ar']))
+            {
+                $seo_content_head_main="[en]".($data['seo_content_head_main_en']??' ')."[en]"."[ar]".($data['seo_content_head_main_ar']??' ')."[ar]";
+
+            }
+
+            if(!empty($data['seo_content_head_activities_en']) || !empty($data['seo_content_head_activities_ar']))
+            {
+                $seo_content_head_activities="[en]".($data['seo_content_head_activities_en']??' ')."[en]"."[ar]".($data['seo_content_head_activities_ar']??' ')."[ar]";
+
+            }
+
+                $seo_content_head=[
+                    'main'=>$seo_content_head_main??' ',
+                    'activities'=>$seo_content_head_activities??' '
+                ];
+
+
+            if (isset($data['seo_content_listing_main_pictures']) && is_array($data['seo_content_listing_main_pictures'])) 
+                {
+                $year = date('Y');
+                $month = date('m');
+
+                $folderPath = public_path("wp-content/uploads/{$year}/{$month}");
+
+                if (!file_exists($folderPath)) {
+                    mkdir($folderPath, 0777, true);
+                }
+
+                foreach ($data['seo_content_listing_main_pictures'] as $index => $picture) {
+                    if ($picture instanceof \Illuminate\Http\UploadedFile) {
+                        // Generate unique name
+                        $SeoContentListingMainPicture = time().'_'.uniqid().'.'.$picture->extension();
+
+                        // Move file
+                        $picture->move($folderPath, $SeoContentListingMainPicture);
+
+                        // Path
+                        $picturePath = "wp-content/uploads/{$year}/{$month}/{$SeoContentListingMainPicture}";
+
+                        // Push values
+                        $Seo_Content_Listing_Main["main"]["pictures"][] = $picturePath;
+                    $Seo_Content_Listing_Main["main"]["alt_text"] []=
+                "[en]" . (base64_encode($data['seo_content_listing_main_alt_text_en'][$index] ?? '')) . "[en]"
+                . "[ar]" . (base64_encode($data['seo_content_listing_main_alt_text_ar'][$index] ?? '')) . "[ar]";
+
+
+                        
+                        $Seo_Content_Listing_Main["main"]["names"][] = "[en]" . (base64_encode($data['seo_content_listing_main_names_en'][$index] ?? '')) . "[en]"
+                . "[ar]" . (base64_encode($data['seo_content_listing_main_names_ar'][$index] ?? '')) . "[ar]";
+                    
+                        $Seo_Content_Listing_Main["main"]["contents"]["en"][] ="[en]" . (base64_encode($data['seo_content_listing_main_contents_en'][$index] ?? '')) . "[en]"
+                . "[ar]" . (base64_encode($data['seo_content_listing_main_contents_ar'][$index] ?? '')) . "[ar]";
+
+                    }
+                }
+                }
+
+
+            if (isset($data['seo_content_listing_activities_pictures']) && is_array($data['seo_content_listing_activities_pictures'])) 
+                {
+                $year = date('Y');
+                $month = date('m');
+
+                $folderPath = public_path("wp-content/uploads/{$year}/{$month}");
+
+                if (!file_exists($folderPath)) {
+                    mkdir($folderPath, 0777, true);
+                }
+
+                foreach ($data['seo_content_listing_activities_pictures'] as $index => $picture) {
+                    if ($picture instanceof \Illuminate\Http\UploadedFile) {
+                        // Generate unique name
+                        $SeoContentListingActivitiesPicture = time().'_'.uniqid().'.'.$picture->extension();
+
+                        // Move file
+                        $picture->move($folderPath, $SeoContentListingActivitiesPicture);
+
+                        // Path
+                        $picturePath = "wp-content/uploads/{$year}/{$month}/{$SeoContentListingActivitiesPicture}";
+
+                        // Push values
+                        $Seo_Content_Listing_Main["activities"]["pictures"][] = $picturePath;
+                    $Seo_Content_Listing_Main["activities"]["alt_text"] []=
+                "[en]" . (base64_encode($data['seo_content_listing_activities_alt_text_en'][$index] ?? '')) . "[en]"
+                . "[ar]" . (base64_encode($data['seo_content_listing_activities_alt_text_ar'][$index] ?? '')) . "[ar]";
+
+
+
+                        $Seo_Content_Listing_Main["activities"]["names"][] = "[en]" . (base64_encode($data['seo_content_listing_activities_names_en'][$index] ?? '')) . "[en]"
+                . "[ar]" . (base64_encode($data['seo_content_listing_activities_names_ar'][$index] ?? '')) . "[ar]";
+
+                        $Seo_Content_Listing_Main["activities"]["contents"]["en"][] ="[en]" . (base64_encode($data['seo_content_listing_activities_contents_en'][$index] ?? '')) . "[en]"
+                . "[ar]" . (base64_encode($data['seo_content_listing_activities_contents_ar'][$index] ?? '')) . "[ar]";
+
+                    }
+                }
+                }
+
+  
+    $finalSEO_CONTENT_LISTING=serialize($Seo_Content_Listing_Main);
+
+
+                
+
+
+    /***
+                     * 
+                     * Start Section OF FAQ 
+                     * 
+                     */              
+                    
+                    $main_question_text_en = $data['main_question_text_en'] ?? [];
+                    $main_question_text_ar = $data['main_question_text_ar'] ?? [];
+                    $main_answer_text_en   = $data['main_answer_text_en'] ?? [];
+                    $main_answer_text_ar   = $data['main_answer_text_ar'] ?? [];
+
+                    $activities_question_text_en = $data['activities_question_text_en'] ?? [];
+                    $activities_question_text_ar = $data['activities_question_text_ar'] ?? [];
+                    $activities_answer_text_en   = $data['activities_answer_text_en'] ?? [];
+                    $activities_answer_text_ar   = $data['activities_answer_text_ar'] ?? [];
+
+
+    
+
+
+                    $main_questions_final =    AdminHelper::wrapLang($main_question_text_en, $main_question_text_ar);
+                    // encode Main answers
+                    $main_answers_final   = AdminHelper::wrapLang($main_answer_text_en, $main_answer_text_ar);
+                    // encode Activities questions
+                    $activities_questions_final = AdminHelper::wrapLang($activities_question_text_en, $activities_question_text_ar);
+                    // encode Activities answers
+                    $activities_answers_final   =AdminHelper::wrapLang($activities_answer_text_en, $activities_answer_text_ar);
+                    // final structure to save and serialize
+                    $faq = [
+                                        
+                        "main" => [
+                            "questions" => $main_questions_final,
+                            "answers"   => $main_answers_final,
+                        ],
+                        "activities" => [   
+                            "questions" => $activities_questions_final,
+                            "answers"   => $activities_answers_final,
+                        ],
+
+
+
+
+                    ];
+
+                        // serialize the whole structure
+                        $faq_serialized = serialize($faq); // Final serialize the whole structure
+
+                /***
+                 * 
+                 * END SECTION OF FAQ
+                 */
+
+
+
+                        /***
+                 * 
+                 * Start Section OF Categories LIST 
+                 * 
+                 */
+                    $categories_list = [];
+
+                    if (isset($data['categories_list'] ) && is_array($data['categories_list'])) 
+                        {
+                            foreach ($data['categories_list'] as $parentId => $childIds) 
+                                {
+                                $parentExists = DB::table('wp_packages_main_category')
+                                    ->where('id', $parentId)
+                                    ->exists();
+
+                                if (!$parentExists) {
+                                    continue;
+                                }
+
+                                $validChildren = DB::table('wp_adventure_type')
+                                    ->where('category_id', $parentId)
+                                    ->whereIn('id', $childIds)
+                                    ->pluck('id')
+                                    ->toArray();
+
+                                if (empty($validChildren)) {
+                                    continue;
+                                }
+
+                                $childrenArray = [];
+                                foreach ($validChildren as $childId) {
+                                    $childrenArray[$childId] = (string) $childId;
+                                }
+
+                                $categories_list[$parentId] = $childrenArray;
+                                }
+                        }
+
+                    $Categories_serialized = serialize($categories_list); //Final Serialized to DB of Categories List
+            
+                /***
+                 * 
+                 * END SECTION OF Categories LIST 
+                 */
+
+                $google_map = serialize([
+                    'location'  => $data['location'] ?? null,  
+                    'latitude'  => $data['latitude'] ?? null,  
+                    'longitude' => $data['longitude'] ?? null   
+                ]);        
+                $currency = "[en]" . ($data['currency_en'] ?? '') . "[en]"
+                . "[ar]" . ($data['currency_ar'] ?? '') . "[ar]";
+
+                $Slug=str_replace(' ', '-', strtolower($data['title']));
+                $slug_province_city = $province_id['slug'] . '-' .$Slug;
+                $search_query=$title;
+                $search_query_ar=$title_ar;
+
+
+                $Meta_title = "[en]" . ($data['meta_title_en'] ?? ' ') . "[en]"
+                . "[ar]" . ($data['meta_title_ar'] ?? ' ') . "[ar]";
+                $Meta_Description = "[en]" . ($data['meta_description_en'] ?? ' ') . "[en]"
+                . "[ar]" . ($data['meta_description_ar'] ?? ' ') . "[ar]";
+                $Meta_Keywords = "[en]" . "[en]" . "[ar]" . "[ar]";
+
+
+                $Meta_title_activities = "[en]" . ($data['meta_title_activities_en'] ?? ' ') . "[en]"
+                    . "[ar]" . ($data['meta_title_activities_ar'] ?? ' ') . "[ar]";
+                $Meta_Description_activities = "[en]" . ($data['meta_description_activities_en'] ?? ' ') . "[en]"
+                    . "[ar]" . ($data['meta_description_activities_ar'] ?? ' ') . "[ar]";
+                $Meta_Keywords_activities = "[en]" . "[en]"
+                    . "[ar]" . "[ar]";
+
+
+
+            // For Main Footers
+
+                $footers_main_titles_final = AdminHelper::wrapLang(
+                    $data['footers_main_titles_en'] ?? '',
+                    $data['footers_main_titles_ar'] ?? ''
+                );
+
+                $footers_main_anchor_texts_final = AdminHelper::wrapLang(
+                    $data['footers_main_anchor_texts_en'] ?? [],
+                    $data['footers_main_anchor_texts_ar'] ?? []
+                );
+
+                $footers_main_anchor_links_final = AdminHelper::wrapLang(
+                    $data['footers_main_anchor_links_en'] ?? [],
+                    $data['footers_main_anchor_links_ar'] ?? []
+                );
+
+                    
+                
+
+    
+
+
+
+
+
+                $footers = [
+
+
+                    "main" => 
+                            [
+                                "footer_titles" => $footers_main_titles_final,
+                                "anchor_texts"  => $footers_main_anchor_texts_final,
+                                "anchor_links"  => $footers_main_anchor_links_final,
+                            ]
+                ];
+
+
+                $Footers_encoded = serialize($footers);
+                $Status=$data['status'] ?? 0;
+
+
+
+
+    $city=new City();
+        $city->country_id=$data['country_id'];
+        $city->province_id=$data['province_id'];
+        $city->city_code=$city_code;
+        $city->name=$name;
+        $city->name_ar=$name_ar;
+        $city->title=$title;
+        $city->title_ar=$title_ar;
+        $city->banner=$main_banner_path;
+        $city->banner_alt_text=$main_banner_alt_text;
+        $city->banner_activities=$activities_banner_path;
+        $city->banner_activities_alt_text=$activities_banner_alt_text;
+        $city->banner_restaurants=$resturants_banner_path;
+        $city->banner_restaurants_alt_text=$resturants_banner_alt_text;
+
+        $city->video_activities=$video_activities_path;
+        $city->seo_overview=$final_seo_overview;
+        $city->seo_listing=$Seo_listing_finalize;
+        $city->seo_content_head=$seo_content_head;
+        $city->seo_content_listing=$finalSEO_CONTENT_LISTING;
+
+        $city->faq=!empty($faq_serialized) ? unserialize($faq_serialized) : '';
+        $city->categories_list=!empty($Categories_serialized) ? unserialize($Categories_serialized) : '';
+        $city->google_map=$google_map;
+        $city->currency=$currency;
+        $city->price_info="";
+        $city->slug=$Slug;
+        $city->slug_province_city=$slug_province_city;
+        $city->search_query=$search_query;
+        $city->search_query_ar=$search_query_ar;
+        $city->meta_title=$Meta_title;
+        $city->meta_description=$Meta_Description;
+        $city->meta_keywords=$Meta_Keywords;
+        $city->meta_title_activities=$Meta_title_activities;
+        $city->meta_description_activities=$Meta_Description_activities;
+        $city->meta_keywords_activities=$Meta_Keywords_activities;
+
+        $city->footer_links=!empty($Footers_encoded) ? unserialize($Footers_encoded) : '';
+        $city->status=$Status;
+
+
+        $city->number_activities=0;
+        $city->number_restaurants=0;
+        $city->booking_count_month=0;
+        $city->save();
+
+        return response()->json([
+            'status' => 'success',
+            'data' => $city
+        ], 200);
+    }
+    catch (\Exception $e) {
+        return response()->json([
+            'error'   => 'Something went wrong!',
+            'message' => $e->getMessage()
+        ], 500);
+    }
+}
+
+
+
+    public function updateCity($id,$data)
+    {
+        try {
+            $city = City::findOrFail($id);
+            $province_id=Province::where('id',$data['province_id'])->first();
+            $city_code=$data['city_code'] ?? $city->city_code;
+            $name=$data['name'] ?? $city->name;
+            $name_ar=$data['name_ar'] ?? $city->name_ar;
+            $title=$data['title'] ?? $city->title;
+            $title_ar=$data['title_ar'] ?? $city->title_ar;
+
+            $main_banner_path=$city->banner_image ??null;
+            $main_banner_alt_text=$city->banner_alt_text ??null;
+            if (isset($data['banner_image']) && $data['banner_image'] instanceof \Illuminate\Http\UploadedFile) 
+                {
+
+                    $year = date('Y');   
+                    $month = date('m'); 
+
+                    $folderPath = public_path("wp-content/uploads/{$year}/{$month}");
+
+                    if (!file_exists($folderPath)) {
+                        mkdir($folderPath, 0777, true);
+                    }
+
+                    $MainBannerPath = time().'_'.uniqid().'.'.$data['banner_image']->extension();
+
+                    $data['banner_image']->move($folderPath, $MainBannerPath);
+
+                    $main_banner_path = "wp-content/uploads/{$year}/{$month}/{$MainBannerPath}";
+                    $main_banner_alt_text = "[en]".($data['banner_alt_text_en']??'')."[en]"."[ar]".($data['banner_alt_text_ar']??'')."[ar]";
+
+
+                }
+                $activities_banner_path=$city->banner_activities ??null;
+                $activities_banner_alt_text=$city->banner_activities_alt_text ??null;
+            if (isset($data['banner_activities_image']) && $data['banner_activities_image'] instanceof \Illuminate\Http\UploadedFile) 
+                {
+
+                    $year = date('Y');   
+                    $month = date('m'); 
+
+                    $folderPath = public_path("wp-content/uploads/{$year}/{$month}");
+
+                    if (!file_exists($folderPath)) {
+                        mkdir($folderPath, 0777, true);
+                    }
+
+                    $ActivitiesBannerPath = time().'_'.uniqid().'.'.$data['banner_activities_image']->extension();
+
+                    $data['banner_activities_image']->move($folderPath, $ActivitiesBannerPath);
+
+                    $activities_banner_path = "wp-content/uploads/{$year}/{$month}/{$ActivitiesBannerPath}";
+                    $activities_banner_alt_text = "[en]".($data['banner_activities_alt_text_en']??'')."[en]"."[ar]".($data['banner_activities_alt_text_ar']??'')."[ar]";
+
+
+                }
+                $resturants_banner_path=$city->banner_restaurants ??null;
+                $resturants_banner_alt_text=$city->banner_restaurants_alt_text ??null;
+            if (isset($data['banner_restaurants_image']) && $data['banner_restaurants_image'] instanceof \Illuminate\Http\UploadedFile) 
+                {
+
+                    $year = date('Y');   
+                    $month = date('m'); 
+
+                    $folderPath = public_path("wp-content/uploads/{$year}/{$month}");
+
+                    if (!file_exists($folderPath)) {
+                        mkdir($folderPath, 0777, true);
+                    }
+
+                    $ResturantsBannerPath = time().'_'.uniqid().'.'.$data['banner_restaurants_image']->extension();
+
+                    $data['banner_restaurants_image']->move($folderPath, $ResturantsBannerPath);
+
+                    $resturants_banner_path = "wp-content/uploads/{$year}/{$month}/{$ResturantsBannerPath}";
+                    $resturants_banner_alt_text = "[en]".($data['banner_restaurants_alt_text_en']??'')."[en]"."[ar]".($data['banner_restaurants_alt_text_ar']??'')."[ar]";
+
+
+                }
+                $video_activities_path=$city->video_activities ??null;
+                if (isset($data['video_activities']) && $data['video_activities'] instanceof \Illuminate\Http\UploadedFile) 
+                {
+                    $year = date('Y');   
+                    $month = date('m'); 
+
+                    $folderPath = public_path("wp-content/uploads/{$year}/{$month}");
+
+                    if (!file_exists($folderPath)) {
+                        mkdir($folderPath, 0777, true);
+                    }
+
+                    $videoActivitiesName = time() . '_' . uniqid() . '.' . $data['video_activities']->extension();
+
+                    $data['video_activities']->move($folderPath, $videoActivitiesName);
+
+                    $video_activities_path = "wp-content/uploads/{$year}/{$month}/{$videoActivitiesName}";
+
+                }
+            $final_seo_overview=$city->seo_overview ??null;
+
+            if(!empty($data['seo_overview_main_en']) || !empty($data['seo_overview_main_ar']) || !empty($data['seo_overview_activities_en']) || !empty($data['seo_overview_activities_ar']))
+            {
+                $seo_overview=[
+                    "main"=>[
+                    'en'=>$data['seo_overview_main_en']??'',
+                    'ar'=>$data['seo_overview_main_ar']??'',
+                    ],
+                    "activities"=>[
+                        'en'=>$data['seo_overview_activities_en']??'',
+                        'ar'=>$data['seo_overview_activities_ar']??'',
+                    ]
+                ];
+                $final_seo_overview = serialize($seo_overview);
+        
+            }
+            $Seo_listing_finalize=$city->seo_listing ??null;
+            if((isset($data['seo_listing_main_pictures']) && $data['seo_listing_main_pictures'] instanceof \Illuminate\Http\UploadedFile))
+            {
+
+                $year = date('Y');
+                $month = date('m'); 
+
+                $folderPath = public_path("wp-content/uploads/{$year}/{$month}");
+
+                if (!file_exists($folderPath)) {
+                    mkdir($folderPath, 0777, true);
+                }
+
+                $SeoListingMainOicture = time().'_'.uniqid().'.'.$data['seo_listing_main_pictures']->extension();
+
+                $data['seo_listing_main_pictures']->move($folderPath, $SeoListingMainOicture);
+
+                $Seo_Listing_main_picture_path = "wp-content/uploads/{$year}/{$month}/{$SeoListingMainOicture}";
+
+                $Seo_Listing_Main_alt_text = "[en]".base64_encode(($data['seo_listing_main_alt_text_en']??' '))."[en]"."[ar]".base64_encode(($data['seo_listing_main_alt_text_ar']??' '))."[ar]";
+
+                $Seo_Listing_Main_names = "[en]".base64_encode(($data['seo_listing_main_names_en']??' '))."[en]"."[ar]".base64_encode(($data['seo_listing_main_names_ar']??' '))."[ar]";
+
+                $Seo_Listing_Main_Contents = "[en]".base64_encode(($data['seo_listing_main_contents_en']??' '))."[en]"."[ar]".base64_encode(($data['seo_listing_main_contents_ar']??' '))."[ar]";
+
+            }
+
+
+            if((isset($data['seo_listing_activities_pictures']) && $data['seo_listing_activities_pictures'] instanceof \Illuminate\Http\UploadedFile))
+            {
+
+                $year = date('Y');
+                $month = date('m'); 
+
+                $folderPath = public_path("wp-content/uploads/{$year}/{$month}");
+
+                if (!file_exists($folderPath)) {
+                    mkdir($folderPath, 0777, true);
+                }
+
+                $SeoListingMainOicture = time().'_'.uniqid().'.'.$data['seo_listing_activities_pictures']->extension();
+
+                $data['seo_listing_activities_pictures']->move($folderPath, $SeoListingMainOicture);
+
+                $Seo_Listing_Activities_picture_path = "wp-content/uploads/{$year}/{$month}/{$SeoListingMainOicture}";
+
+                $Seo_Listing_Activities_alt_text = "[en]".($data['seo_listing_activities_alt_text_en']??' ')."[en]"."[ar]".($data['seo_listing_activities_alt_text_ar']??' ')."[ar]";
+
+                $Seo_Listing_Activities_names = "[en]".($data['seo_listing_activities_names_en']??' ')."[en]"."[ar]".($data['seo_listing_activities_names_ar']??' ')."[ar]";
+
+                $Seo_Listing_Activities_Contents = "[en]".($data['seo_listing_activities_contents_en']??' ')."[en]"."[ar]".($data['seo_listing_activities_contents_ar']??' ')."[ar]";
+
+            }
+
+                $Seo_listing_finalize=serialize([
+                    'main'=>[
+                        'picture'=>[$Seo_Listing_main_picture_path??''],
+                        'alt_text'=>$Seo_Listing_Main_alt_text??'[en][en][ar][ar]',
+                        'names'=>$Seo_Listing_Main_names??'[en][en][ar][ar]',
+                        'contents'=>$Seo_Listing_Main_Contents??'[en][en][ar][ar]',
+                    
+                        ],
+                    'activities'=>[
+                        'picture'=>[$Seo_Listing_Activities_picture_path??''],
+                        'alt_text'=>$Seo_Listing_Activities_alt_text??'[en][en][ar][ar]',
+                        'names'=>$Seo_Listing_Activities_names??'[en][en][ar][ar]',
+                        'contents'=>$Seo_Listing_Activities_Contents??'[en][en][ar][ar]',
+                    ]
+                ]);
+
+
+
+                $seo_content_head=$city->seo_content_head ??null;
+
+            if(!empty($data['seo_content_head_main_en']) || !empty($data['seo_content_head_main_ar']))
+            {
+                $seo_content_head_main="[en]".($data['seo_content_head_main_en']??' ')."[en]"."[ar]".($data['seo_content_head_main_ar']??' ')."[ar]";
+
+            }
+
+            if(!empty($data['seo_content_head_activities_en']) || !empty($data['seo_content_head_activities_ar']))
+            {
+                $seo_content_head_activities="[en]".($data['seo_content_head_activities_en']??' ')."[en]"."[ar]".($data['seo_content_head_activities_ar']??' ')."[ar]";
+
+            }
+
+                $seo_content_head=[
+                    'main'=>$seo_content_head_main??' ',
+                    'activities'=>$seo_content_head_activities??' '
+                ];
+
+                $finalSEO_CONTENT_LISTING=$city->seo_content_listing ??null;
+            if (isset($data['seo_content_listing_main_pictures']) && is_array($data['seo_content_listing_main_pictures'])) 
+                {
+                $year = date('Y');
+                $month = date('m');
+
+                $folderPath = public_path("wp-content/uploads/{$year}/{$month}");
+
+                if (!file_exists($folderPath)) {
+                    mkdir($folderPath, 0777, true);
+                }
+
+                foreach ($data['seo_content_listing_main_pictures'] as $index => $picture) {
+                    if ($picture instanceof \Illuminate\Http\UploadedFile) {
+                        // Generate unique name
+                        $SeoContentListingMainPicture = time().'_'.uniqid().'.'.$picture->extension();
+
+                        // Move file
+                        $picture->move($folderPath, $SeoContentListingMainPicture);
+
+                        // Path
+                        $picturePath = "wp-content/uploads/{$year}/{$month}/{$SeoContentListingMainPicture}";
+
+                        // Push values
+                        $Seo_Content_Listing_Main["main"]["pictures"][] = $picturePath;
+                    $Seo_Content_Listing_Main["main"]["alt_text"] []=
+                "[en]" . (base64_encode($data['seo_content_listing_main_alt_text_en'][$index] ?? '')) . "[en]"
+                . "[ar]" . (base64_encode($data['seo_content_listing_main_alt_text_ar'][$index] ?? '')) . "[ar]";
+
+
+                        
+                        $Seo_Content_Listing_Main["main"]["names"][] = "[en]" . (base64_encode($data['seo_content_listing_main_names_en'][$index] ?? '')) . "[en]"
+                . "[ar]" . (base64_encode($data['seo_content_listing_main_names_ar'][$index] ?? '')) . "[ar]";
+                    
+                        $Seo_Content_Listing_Main["main"]["contents"]["en"][] ="[en]" . (base64_encode($data['seo_content_listing_main_contents_en'][$index] ?? '')) . "[en]"
+                . "[ar]" . (base64_encode($data['seo_content_listing_main_contents_ar'][$index] ?? '')) . "[ar]";
+
+                    }
+                }
+                }
+
+
+            if (isset($data['seo_content_listing_activities_pictures']) && is_array($data['seo_content_listing_activities_pictures'])) 
+                {
+                $year = date('Y');
+                $month = date('m');
+
+                $folderPath = public_path("wp-content/uploads/{$year}/{$month}");
+
+                if (!file_exists($folderPath)) {
+                    mkdir($folderPath, 0777, true);
+                }
+
+                foreach ($data['seo_content_listing_activities_pictures'] as $index => $picture) {
+                    if ($picture instanceof \Illuminate\Http\UploadedFile) {
+                        // Generate unique name
+                        $SeoContentListingActivitiesPicture = time().'_'.uniqid().'.'.$picture->extension();
+
+                        // Move file
+                        $picture->move($folderPath, $SeoContentListingActivitiesPicture);
+
+                        // Path
+                        $picturePath = "wp-content/uploads/{$year}/{$month}/{$SeoContentListingActivitiesPicture}";
+
+                        // Push values
+                        $Seo_Content_Listing_Main["activities"]["pictures"][] = $picturePath;
+                    $Seo_Content_Listing_Main["activities"]["alt_text"] []=
+                "[en]" . (base64_encode($data['seo_content_listing_activities_alt_text_en'][$index] ?? '')) . "[en]"
+                . "[ar]" . (base64_encode($data['seo_content_listing_activities_alt_text_ar'][$index] ?? '')) . "[ar]";
+
+
+
+                        $Seo_Content_Listing_Main["activities"]["names"][] = "[en]" . (base64_encode($data['seo_content_listing_activities_names_en'][$index] ?? '')) . "[en]"
+                . "[ar]" . (base64_encode($data['seo_content_listing_activities_names_ar'][$index] ?? '')) . "[ar]";
+
+                        $Seo_Content_Listing_Main["activities"]["contents"]["en"][] ="[en]" . (base64_encode($data['seo_content_listing_activities_contents_en'][$index] ?? '')) . "[en]"
+                . "[ar]" . (base64_encode($data['seo_content_listing_activities_contents_ar'][$index] ?? '')) . "[ar]";
+
+                    }
+                }
+                }
+
+  
+    $finalSEO_CONTENT_LISTING=serialize($Seo_Content_Listing_Main);
+
+
+                
+
+
+/***
+                 * 
+                 * Start Section OF FAQ 
+                 * 
+                 */              
+                $faq_serialized=$city->faq ??null;
+                if(!empty($data['main_question_text_en']) || !empty($data['main_question_text_ar']) || !empty($data['main_answer_text_en']) || !empty($data['main_answer_text_ar']) || !empty($data['activities_question_text_en']) || !empty($data['activities_question_text_ar']) || !empty($data['activities_answer_text_en']) || !empty($data['activities_answer_text_ar']))
+                {
+                $main_question_text_en = $data['main_question_text_en'] ?? [];
+                $main_question_text_ar = $data['main_question_text_ar'] ?? [];
+                $main_answer_text_en   = $data['main_answer_text_en'] ?? [];
+                $main_answer_text_ar   = $data['main_answer_text_ar'] ?? [];
+
+                $activities_question_text_en = $data['activities_question_text_en'] ?? [];
+                $activities_question_text_ar = $data['activities_question_text_ar'] ?? [];
+                $activities_answer_text_en   = $data['activities_answer_text_en'] ?? [];
+                $activities_answer_text_ar   = $data['activities_answer_text_ar'] ?? [];
+
+
+  
+
+
+                $main_questions_final =    AdminHelper::wrapLang($main_question_text_en, $main_question_text_ar);
+                // encode Main answers
+                $main_answers_final   = AdminHelper::wrapLang($main_answer_text_en, $main_answer_text_ar);
+                // encode Activities questions
+                $activities_questions_final = AdminHelper::wrapLang($activities_question_text_en, $activities_question_text_ar);
+                // encode Activities answers
+                $activities_answers_final   =AdminHelper::wrapLang($activities_answer_text_en, $activities_answer_text_ar);
+                // final structure to save and serialize
+                $faq = [
+                                       
+                    "main" => [
+                        "questions" => $main_questions_final,
+                        "answers"   => $main_answers_final,
+                    ],
+                    "activities" => [   
+                        "questions" => $activities_questions_final,
+                        "answers"   => $activities_answers_final,
+                    ],
+
+
+
+
+                ];
+
+                    // serialize the whole structure
+                    $faq_serialized = serialize($faq); // Final serialize the whole structure
+            }
+            /***
+             * 
+             * END SECTION OF FAQ
+             */
+
+
+
+                      /***
+             * 
+             * Start Section OF Categories LIST 
+             * 
+             */
+                $categories_list = [];
+                $Categories_serialized=$city->categories_list??null;
+                if (isset($data['categories_list'] ) && is_array($data['categories_list'])) 
+                    {
+                        foreach ($data['categories_list'] as $parentId => $childIds) 
+                            {
+                            $parentExists = DB::table('wp_packages_main_category')
+                                ->where('id', $parentId)
+                                ->exists();
+
+                            if (!$parentExists) {
+                                continue;
+                            }
+
+                            $validChildren = DB::table('wp_adventure_type')
+                                ->where('category_id', $parentId)
+                                ->whereIn('id', $childIds)
+                                ->pluck('id')
+                                ->toArray();
+
+                            if (empty($validChildren)) {
+                                continue;
+                            }
+
+                            $childrenArray = [];
+                            foreach ($validChildren as $childId) {
+                                $childrenArray[$childId] = (string) $childId;
+                            }
+
+                            $categories_list[$parentId] = $childrenArray;
+                            }
+                              $Categories_serialized = serialize($categories_list); //Final Serialized to DB of Categories List
+                    }
+
+              
+        
+            /***
+             * 
+             * END SECTION OF Categories LIST 
+             */
+
+            $google_map = serialize([
+                'location'  => $data['location'] ?? null,  
+                'latitude'  => $data['latitude'] ?? null,  
+                'longitude' => $data['longitude'] ?? null   
+            ]) ?? $city->google_map;        
+             $currency = ("[en]" . ($data['currency_en'] ?? '') . "[en]"
+            . "[ar]" . ($data['currency_ar'] ?? '') . "[ar]")??$city->currency;
+
+            $Slug=(str_replace(' ', '-', strtolower($data['title'])))??$city->slug;
+            $slug_province_city = ($province_id['slug'] . '-' .$Slug) ?? $city->slug_province_city;
+            $search_query=$data['title'] ?? $city->title;
+            $search_query_ar=$data['title_ar'] ?? $city->title_ar;
+
+
+            $Meta_title = ("[en]" . ($data['meta_title_en'] ?? ' ') . "[en]"
+            . "[ar]" . ($data['meta_title_ar'] ?? ' ') . "[ar]") ?? $city->meta_title;
+            $Meta_Description = ("[en]" . ($data['meta_description_en'] ?? ' ') . "[en]"
+            . "[ar]" . ($data['meta_description_ar'] ?? ' ') . "[ar]") ?? $city->meta_description;
+            $Meta_Keywords = ("[en]" . "[en]" . "[ar]" . "[ar]") ?? $city->meta_keywords;
+
+
+            $Meta_title_activities = ("[en]" . ($data['meta_title_activities_en'] ?? ' ') . "[en]"
+                . "[ar]" . ($data['meta_title_activities_ar'] ?? ' ') . "[ar]") ?? $city->meta_title_activities;
+            $Meta_Description_activities = ("[en]" . ($data['meta_description_activities_en'] ?? ' ') . "[en]"
+                . "[ar]" . ($data['meta_description_activities_ar'] ?? ' ') . "[ar]") ?? $city->meta_description_activities;
+            $Meta_Keywords_activities = ("[en]" . "[en]"
+                . "[ar]" . "[ar]") ?? $city->meta_keywords_activities;
+
+
+
+         // For Main Footers
+                $Footers_encoded=$city->footer_links ?? null;
+            $footers_main_titles_final = AdminHelper::wrapLang(
+                $data['footers_main_titles_en'] ?? '',
+                $data['footers_main_titles_ar'] ?? ''
+            );
+
+            $footers_main_anchor_texts_final = AdminHelper::wrapLang(
+                $data['footers_main_anchor_texts_en'] ?? [],
+                $data['footers_main_anchor_texts_ar'] ?? []
+            );
+
+            $footers_main_anchor_links_final = AdminHelper::wrapLang(
+                $data['footers_main_anchor_links_en'] ?? [],
+                $data['footers_main_anchor_links_ar'] ?? []
+            );
+
+                
+            
+
+   
+
+
+
+
+
+            $footers = [
+
+
+                "main" => 
+                        [
+                            "footer_titles" => $footers_main_titles_final,
+                            "anchor_texts"  => $footers_main_anchor_texts_final,
+                            "anchor_links"  => $footers_main_anchor_links_final,
+                        ]
+            ];
+
+
+            $Footers_encoded = serialize($footers);
+
+            $Status=$data['status'] ?? $city->status;
+
+
+
+
+
+
+
+
+            $city->update([
+                'country_id' => $data['country_id'] ?? $city->country_id,
+                'province_id' => $data['province_id'] ?? $city->province_id,
+                'city_code' => $city_code,
+                'name' => $name,
+                'name_ar' => $name_ar,
+                'title' => $title,
+                'title_ar' => $title_ar,
+                'banner' => $main_banner_path,
+                'banner_alt_text' => $main_banner_alt_text,
+                'banner_activities' => $activities_banner_path,
+                'banner_activities_alt_text' => $activities_banner_alt_text,
+                'banner_restaurants' => $resturants_banner_path,
+                'banner_restaurants_alt_text' => $resturants_banner_alt_text,
+                'video_activities' => $video_activities_path,
+                'seo_overview' => $final_seo_overview,
+                'seo_listing' => $Seo_listing_finalize,
+                'seo_content_head' => $seo_content_head,
+                'seo_content_listing' => $finalSEO_CONTENT_LISTING,
+
+        'faq' => !empty($faq_serialized) ? unserialize($faq_serialized) : '',
+        'categories_list' => !empty($Categories_serialized) ? unserialize($Categories_serialized) : '',
+        'google_map' => $google_map,
+        'currency' => $currency,
+        'price_info' => "",
+        'slug' => $Slug,
+        'slug_province_city' => $slug_province_city,
+        'search_query' => $search_query,
+        'search_query_ar' => $search_query_ar,
+        'meta_title' => $Meta_title,
+        'meta_description' => $Meta_Description,
+        'meta_keywords' => $Meta_Keywords,
+        'meta_title_activities' => $Meta_title_activities,
+        'meta_description_activities' => $Meta_Description_activities,
+        'meta_keywords_activities' => $Meta_Keywords_activities,
+
+        'footer_links' => !empty($Footers_encoded) ? unserialize($Footers_encoded) : '',
+        'status' => $Status,
+
+
+        "number_activities"=>$city->number_activities,
+        "number_restaurants"=>$city->number_restaurants,
+        "booking_count_month"=>$city->booking_count_month,
+            ]);
+            return response()->json([
+                'status' => 'success',
+                'data' => $city
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+    }
 
 
 
