@@ -11,8 +11,10 @@ use App\Http\Requests\Admin\AddNewUser;
 use App\Http\Requests\Admin\UpdateUserData;
 use App\Http\Requests\Admin\AddNewCountry;
 use App\Http\Requests\Admin\AddNewProvince;
-
+use App\Http\Requests\Admin\AddNewCategory; 
 use App\Http\Requests\Admin\AddNewCity;
+use App\Http\Requests\Admin\UpdateCity;
+use App\Http\Requests\Admin\UpdateCategory;
 use App\Helper\AdminHelper;
 use App\Models\Country;
 class AdminController extends Controller
@@ -161,13 +163,44 @@ class AdminController extends Controller
     public function AddNewCity (AddNewCity $request){
         return $this->adminService->AddNewCity($request->validated());
     }
-    public function updateCity($id, AddNewCity $request)
+    public function updateCity($id, UpdateCity $request)
     {
         return $this->adminService->updateCity($id, $request->validated());
     }
 
+    public function deleteCity($id)
+    {
+        return $this->adminService->deleteCity($id);
+    }
 
 
+    /**
+     * Start section Of Packages Main Category
+     */
 
-    
+    public function getCustomCategory($id)
+    {
+        return $this->adminService->getCustomCategory($id);
+    }
+
+    public function getAllCategories()
+    {
+        return $this->adminService->getAllCategories();
+    }
+
+
+    public function addNewCategory(AddNewCategory $request)
+    {
+        return $this->adminService->addNewCategory($request->validated());
+    }
+
+        public function updateCategory($id, UpdateCategory $request)
+        {
+        return $this->adminService->updateCategory($id, $request->validated());
+    }
+
+    public function deleteCategory($id)
+    {
+        return $this->adminService->deleteCategory($id);
+    }
 }

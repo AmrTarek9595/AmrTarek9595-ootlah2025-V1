@@ -11,6 +11,7 @@ class City extends Model
               protected $fillable = [
                 'city_code',
                 'country_id',
+                'city_sub_id',
                 'province_id',
         'name',
         'name_ar',
@@ -65,6 +66,13 @@ class City extends Model
 
 
     ];
+protected $casts = [
+    'seo_listing'       => 'array',
+    'seo_content_listing' => 'array',
+    'faq'               => 'array',
+    'categories_list'   => 'array',
+    'footer_links'      => 'array',
+];
 
 
     public function provinces()

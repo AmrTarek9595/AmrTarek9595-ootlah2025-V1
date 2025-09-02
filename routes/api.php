@@ -53,7 +53,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/getcustomcountry/{id}', [AdminController::class, 'getCustomountry']); // Get custom Country    
         Route::get('/getallcountries', [AdminController::class, 'getAllCountries']); // Get all Countries     
         Route::post('/addnewcountry', [AdminController::class, 'addNewCountry']); // Add a new Country
-        Route::put('/updatecountry/{id}', [AdminController::class, 'updateCountry']); // Update Country
+        Route::post('/updatecountry/{id}', [AdminController::class, 'updateCountry']); // Update Country
         Route::delete('/deletecountry/{id}', [AdminController::class, 'deleteCountry']); // Delete Country by ID
 
     });
@@ -63,17 +63,26 @@ Route::middleware(['auth:sanctum'])->group(function () {
             Route::get('/getcustomprovince/{id}', [AdminController::class, 'getCustomProvince']); // Return Custom Provinces
             Route::get('/getallprovinces', [AdminController::class, 'getAllProvinces']); // Get All Provinces
             Route::post('/addnewprovince', [AdminController::class, 'addNewProvince']); // Add a new Province
-            Route::put('/updateprovince/{id}', [AdminController::class, 'updateProvince']); // Update Province
+            Route::post('/updateprovince/{id}', [AdminController::class, 'updateProvince']); // Update Province
             Route::delete('/deleteprovince/{id}', [AdminController::class, 'deleteProvince']); // Delete Province by ID
 
     });
 
-             Route::prefix('admin/countries/provinces/city')->middleware(['Role:administrator'])->group(function () {
+            Route::prefix('admin/countries/provinces/city')->middleware(['Role:administrator'])->group(function () {
             Route::get('/getcustomcity/{id}', [AdminController::class, 'getCustomCity']); // Return Custom Cities
             Route::get('/getallcities', [AdminController::class, 'GetAllCities']); // Get All Cities
             Route::post('/addnewcity', [AdminController::class, 'addNewCity']); // Add a new City
-            Route::put('/updatecity/{id}', [AdminController::class, 'updateCity']); // Update City
-            // Route::delete('/deleteprovince/{id}', [AdminController::class, 'deleteProvince']); // Delete Province by ID
+            Route::post('/updatecity/{id}', [AdminController::class, 'updateCity']); // Update City
+            Route::delete('/deletecity/{id}', [AdminController::class, 'deleteCity']); // Delete City by ID
+
+    });
+
+            Route::prefix('admin/packages/main/category')->middleware(['Role:administrator'])->group(function () {
+            Route::get('/getcustomcategory/{id}', [AdminController::class, 'getCustomCategory']); // Return Custom Categories
+            Route::get('/getallcategories', [AdminController::class, 'GetAllCategories']); // Get All Categories
+            Route::post('/addnewcategory', [AdminController::class, 'addNewCategory']); // Add a new Category
+            Route::post('/updatecategory/{id}', [AdminController::class, 'updateCategory']); // Update Category
+            Route::delete('/deletecategory/{id}', [AdminController::class, 'deleteCategory']); // Delete Category by ID
 
     });
 });

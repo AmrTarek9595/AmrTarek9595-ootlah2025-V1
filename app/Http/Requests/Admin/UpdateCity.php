@@ -4,7 +4,7 @@ namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class AddNewCity extends FormRequest
+class UpdateCity extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -21,15 +21,15 @@ class AddNewCity extends FormRequest
      */
     public function rules(): array
     {
-        return [
-                "country_id"=>"required|integer|exists:wp_countries,id",
-                "city_sub_id"=>"required|integer|exists:wp_cities,id",
-                "province_id"=>"required|integer|exists:wp_provinces,id",
-                "city_code"=>'required|string|max:255',
-                'name' => 'required|string|max:255',
-                'name_ar' => 'required|string|max:255',
-                'title' => 'required|string|max:255',
-                'title_ar' => 'required|string|max:255',       
+      return [
+                "country_id"=>"sometimes|integer|exists:wp_countries,id",
+                "province_id"=>"sometimes|integer|exists:wp_provinces,id",
+                "city_sub_id"=>"sometimes|integer|exists:wp_cities,id",
+                "city_code"=>'sometimes|string|max:255',
+                'name' => 'sometimes|string|max:255',
+                'name_ar' => 'sometimes|string|max:255',
+                'title' => 'sometimes|string|max:255',
+                'title_ar' => 'sometimes|string|max:255',       
              /**Banner Params */
                 "banner_alt_text_en"=>"sometimes|string|max:255",
                 "banner_alt_text_ar"=>"sometimes|string|max:255",

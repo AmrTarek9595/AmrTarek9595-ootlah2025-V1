@@ -26,8 +26,8 @@ class AddNewProvince extends FormRequest
             'province_code' => 'required|string|max:255',
             'name' => 'required|string|max:255',
             'name_ar' => 'required|string|max:255',
-            'title' => 'required|string|max:255',
-            'title_ar' => 'required|string|max:255',
+            'title' => 'sometimes|string|max:255',
+            'title_ar' => 'sometimes|string|max:255',
             /**Banner Params */
             "banner_alt_text_en"=>"sometimes|string|max:255",
             "banner_alt_text_ar"=>"sometimes|string|max:255",
